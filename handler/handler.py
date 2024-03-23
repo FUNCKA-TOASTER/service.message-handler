@@ -54,7 +54,7 @@ class MessageHandler(ABCHandler):
                     await logger.info(log_text)
                     return result
 
-        log_text += "did not triggered any action."
+        log_text += "did not triggered any filter."
 
         await logger.info(log_text)
         return False
