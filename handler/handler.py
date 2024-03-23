@@ -26,6 +26,7 @@ class MessageHandler(ABCHandler):
 
         log_text = f"Event <{event.get('event_id')}> "
 
+        # TODO: Try to rework
         if event.get("text", False):
             for text_filter in text_filter_list:
                 selected = text_filter(super().api)
@@ -33,7 +34,6 @@ class MessageHandler(ABCHandler):
                 if result:
                     log_text += f"triggered \"{selected.NAME}\" filter."
                     return result
-
 
         if event.get("attachments", False):
             for attachment_filter in attachments_filter_list:
