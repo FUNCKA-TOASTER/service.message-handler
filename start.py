@@ -8,7 +8,7 @@ Author:
 """
 import asyncio
 from consumer import consumer
-from handler import button_handler
+from handler import message_handler
 from logger import logger
 
 
@@ -22,7 +22,7 @@ async def main():
         log_text = f"Recived new event: {data}"
         await logger.info(log_text)
 
-        await button_handler(data)
+        await message_handler(data)
 
 
 
