@@ -33,6 +33,7 @@ class MessageHandler(ABCHandler):
                 result = await selected(event)
                 if result:
                     log_text += f"triggered \"{selected.NAME}\" filter."
+                    await logger.info(log_text)
                     return result
 
         if event.get("attachments", False):
@@ -41,6 +42,7 @@ class MessageHandler(ABCHandler):
                 result = await selected(event)
                 if result:
                     log_text += f"triggered \"{selected.NAME}\" filter."
+                    await logger.info(log_text)
                     return result
 
         if event.get("reply", False) or event.get("forward", False):
@@ -49,6 +51,7 @@ class MessageHandler(ABCHandler):
                 result = await selected(event)
                 if result:
                     log_text += f"triggered \"{selected.NAME}\" filter."
+                    await logger.info(log_text)
                     return result
 
         log_text += "did not triggered any action."
