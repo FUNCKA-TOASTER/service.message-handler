@@ -13,12 +13,12 @@ class MessageHandler(ABCHandler):
     actions.
     """
     async def _handle(self, event: dict, kwargs) -> bool:
-        if not any(
+        if not any((
             event.get("text", False),
             event.get("attachments", False),
             event.get("reply", False),
             event.get("forward", False)
-        ):
+        )):
             log_text = f"Missing message content <{event.get('event_id')}>"
             await logger.info(log_text)
 
