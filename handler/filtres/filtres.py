@@ -9,4 +9,4 @@ class Filter(BaseFilter):
     NAME = "Filter"
 
     async def _handle(self, event: dict, kwargs) -> bool:
-        return True
+        return False
