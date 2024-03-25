@@ -1,6 +1,6 @@
 # ⚙️ TOASTER.MESSAGE-HANDLING-SERVICE
 
-![drt98l](https://github.com/STALCRAFT-FUNCKA/toaster.event-routing-service/assets/76991612/08409484-c9b2-41f3-9b40-8e43614f0661)
+![main_img](https://github.com/STALCRAFT-FUNCKA/toaster.message-handling-service/assets/76991612/8bb6b3bf-8385-4d4b-80cc-e104d5283a9c)
 
 Вся документирующая информация продублированна внутри кода на английском языке.<br>
 All documenting information is duplicated within the code in English.<br>
