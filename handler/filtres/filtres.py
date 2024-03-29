@@ -26,7 +26,7 @@ class SlowModeQueueFilter(BaseFilter):
             conv_id=event.get("peer_id"),
             user_id=event.get("user_id"),
             user_name=event.get("user_name"),
-            prohibited_until=f"NOW() + INTERVAL {interval} MINUTE AS PUT"
+            prohibited_until=f"NOW()"
         )
 
         return True
