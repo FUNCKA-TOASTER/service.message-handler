@@ -1,3 +1,4 @@
+from vk_api import VkApiError
 from db import db
 from .base import BaseFilter
 
@@ -15,12 +16,17 @@ class SlowModeQueueFilter(BaseFilter):
 
         if self._user_in_queue(event):
             #TODO: Выдать наказание
-            
-            self.api.messages.delete(
-                delete_for_all=1,
-                peer_id=event.get("peer_id"),
-                cmids=event.get("cmid")
-            )
+
+            try:
+                self.api.messages.delete(
+                    delete_for_all=1,
+                    peer_id=event.get("peer_id"),
+                    cmids=event.get("cmid")
+                )
+
+            except VkApiError:
+                ...
+
             return True
 
         #TODO: Апдейт при конфликте
