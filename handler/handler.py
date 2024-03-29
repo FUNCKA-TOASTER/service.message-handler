@@ -1,11 +1,6 @@
 from logger import logger
 from .abc import ABCHandler
-from .filtres import (
-    text_filter_list,
-    attachments_filter_list,
-    reply_filter_list
-)
-
+from .filtres import filter_list
 
 class MessageHandler(ABCHandler):
     """Event handler class that recognizes commands
@@ -26,33 +21,13 @@ class MessageHandler(ABCHandler):
 
         log_text = f"Event <{event.get('event_id')}> "
 
-        # TODO: Try to rework
-        if event.get("text", False):
-            for text_filter in text_filter_list:
-                selected = text_filter(super().api)
-                result = await selected(event)
-                if result:
-                    log_text += f"triggered \"{selected.NAME}\" filter."
-                    await logger.info(log_text)
-                    return result
-
-        if event.get("attachments", False):
-            for attachment_filter in attachments_filter_list:
-                selected = attachment_filter(super().api)
-                result = await selected(event)
-                if result:
-                    log_text += f"triggered \"{selected.NAME}\" filter."
-                    await logger.info(log_text)
-                    return result
-
-        if event.get("reply", False) or event.get("forward", False):
-            for reply_filter in reply_filter_list:
-                selected = reply_filter(super().api)
-                result = await selected(event)
-                if result:
-                    log_text += f"triggered \"{selected.NAME}\" filter."
-                    await logger.info(log_text)
-                    return result
+        for filt in filter_list:
+            selected = filt(super().api)
+            result = await selected(event)
+            if result:
+                log_text += f"triggered \"{selected.NAME}\" filter."
+                await logger.info(log_text)
+                return result
 
         log_text += "did not triggered any filter."
 
