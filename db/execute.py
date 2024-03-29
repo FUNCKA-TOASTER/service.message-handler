@@ -1,6 +1,5 @@
 """Module "db"
 """
-from logger import logger
 
 
 class Executer(object):
