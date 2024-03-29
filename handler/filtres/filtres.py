@@ -14,9 +14,16 @@ class SlowModeQueueFilter(BaseFilter):
             return False
 
         if self._user_in_queue(event):
-            # Выдать наказание
+            #TODO: Выдать наказание
+            
+            self.api.messages.delete(
+                delete_for_all=1,
+                peer_id=event.get("peer_id"),
+                cmids=event.get("cmid")
+            )
             return True
 
+        #TODO: Апдейт при конфликте
         interval = self._get_interval(event)
         query = f"""
         INSERT INTO 
