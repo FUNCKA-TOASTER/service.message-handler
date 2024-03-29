@@ -1,14 +1,14 @@
 from .filtres import (
-    Filter,
+    SlowModeQueueFilter,
 )
 
-text_filter_list = [Filter]
-attachments_filter_list = []
-reply_filter_list = []
+# Filter in order of priority of execution
+filter_list = [
+    SlowModeQueueFilter,
+]
+
 
 
 __all__ = (
-    "text_filter_list",
-    "attachments_filter_list",
-    "reply_filter_list",
+    "filter_list",
 )
