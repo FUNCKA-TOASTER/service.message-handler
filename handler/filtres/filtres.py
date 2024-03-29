@@ -17,16 +17,28 @@ class SlowModeQueueFilter(BaseFilter):
             # Выдать наказание
             return True
 
-
         interval = self._get_interval(event)
-        db.execute.insert(
-            schema="toaster",
-            table="slow_mode_queue",
-            on_duplicate=None,
-            conv_id=event.get("peer_id"),
-            user_id=event.get("user_id"),
-            user_name=event.get("user_name"),
-            prohibited_until=f"NOW() + INTERVAL {interval} MINUTE"
+        query = f"""
+        INSERT INTO 
+            slow_mode_queue 
+            (
+                conv_id,
+                user_id,
+                user_name,
+                prohibited_until
+            )
+        VALUES 
+            (
+                '{event.get("peer_id")}',
+                '{event.get("user_id")}',
+                '{event.get("user_name")}',
+                NOW() + INTERVAL {interval} MINUTE
+            );
+        """
+
+        db.execute.raw(
+            schema="toasters",
+            query=query
         )
 
         return True

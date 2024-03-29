@@ -88,7 +88,7 @@ class Executer(object):
                      """
 
         query += ";"
-        print(query)
+
         self.cur.execute(f'USE {schema};')
         self.cur.execute(query)
 
