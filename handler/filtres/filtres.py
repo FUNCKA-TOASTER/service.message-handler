@@ -37,7 +37,7 @@ class SlowModeQueueFilter(BaseFilter):
         """
 
         db.execute.raw(
-            schema="toasters",
+            schema="toaster",
             query=query
         )
 
