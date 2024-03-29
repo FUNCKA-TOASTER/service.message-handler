@@ -1,5 +1,6 @@
 """Module "db"
 """
+from logger import logger
 
 
 class Executer(object):
@@ -87,7 +88,7 @@ class Executer(object):
                      """
 
         query += ";"
-
+        logger.debug(query)
         self.cur.execute(f'USE {schema};')
         self.cur.execute(query)
 
