@@ -1,4 +1,3 @@
-from vk_api import VkApiError
 from db import db
 from .base import BaseFilter
 
@@ -12,13 +11,13 @@ class SlowModeQueueFilter(BaseFilter):
 
     # TODO: Добавить инор для модерации\администрации\персонала.
     async def _handle(self, event: dict, kwargs) -> bool:
-        if not self._is_anabled(event, "system_status", "Slow_mode"):
+        if not self._is_anabled(event, "slow_mode", "system"):
             return False
 
         if self._user_in_queue(event):
             #TODO: Выдать наказание
 
-            self.delete_own_message(event)
+            self._delete_own_message(event)
             return True
 
         interval = self._get_interval(event)
@@ -80,24 +79,24 @@ class ContentFilter(BaseFilter):
     """
     NAME = "Content filter"
     CONTENT = (
-        "App_action", "Audio",
-        "Audio_message", "Doc",
-        "Forward", "Reply",
-        "Graffiti", "Sticker",
-        "Link", "Photo",
-        "Poll", "Video",
-        "Wall"
+        "app_action", "audio",
+        "audio_message", "doc",
+        "forward", "reply",
+        "graffiti", "sticker",
+        "link", "photo",
+        "poll", "video",
+        "wall"
     )
 
     # TODO: Добавить инор для модерации\администрации\персонала.
     async def _handle(self, event: dict, kwargs) -> bool:
         for content_name in self.CONTENT:
-            if not self._is_anabled(event, "filter_status", content_name):
-                if self._has_content(event, content_name.lower()):
+            if not self._is_anabled(event, content_name, "filter"):
+                if self._has_content(event, content_name):
                     self.NAME = f"Content filter <{content_name}>"
                     #TODO: Выдать наказание
 
-                    self.delete_own_message(event)
+                    self._delete_own_message(event)
                     return True
 
         return False
