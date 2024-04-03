@@ -71,3 +71,53 @@ class SlowModeQueueFilter(BaseFilter):
         )
 
         return int(interval[0][0]) if interval else 0
+
+
+
+# ------------------------------------------------------------------------
+class AppActionFilter(BaseFilter):
+    """Slow mode filter system
+    """
+    NAME = "App action"
+
+    # TODO: Добавить инор для модерации\администрации\персонала.
+    async def _handle(self, event: dict, kwargs) -> bool:
+        if not self._is_anabled(event, "filter_settatus", "App_action"):
+            return False
+
+        if self._has_content(event, "App_action"):
+            #TODO: Выдать наказание
+
+            self.delete_own_message(event)
+            return True
+
+        return False
+
+
+
+class ContentFilter(BaseFilter):
+    """Slow mode filter system
+    """
+    NAME = "Content filter"
+    CONTENT = (
+        "App_action", "Audio",
+        "Audio_message", "Doc",
+        "Forward", "Reply",
+        "Graffiti", "Sticker",
+        "Link", "Photo",
+        "Poll", "Video",
+        "Wall"
+    )
+
+    # TODO: Добавить инор для модерации\администрации\персонала.
+    async def _handle(self, event: dict, kwargs) -> bool:
+        for content_name in self.CONTENT:
+            if self._is_anabled(event, "filter_settatus", content_name):
+                if self._has_content(event, content_name):
+                    self.NAME = f"Content filter <{content_name}>"
+                    #TODO: Выдать наказание
+
+                    self.delete_own_message(event)
+                    return True
+
+        return False
