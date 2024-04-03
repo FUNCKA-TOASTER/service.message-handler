@@ -10,6 +10,7 @@ class SlowModeQueueFilter(BaseFilter):
     """
     NAME = "Slow mode queue"
 
+    # TODO: Добавить инор для модерации\администрации\персонала.
     async def _handle(self, event: dict, kwargs) -> bool:
         if not self._is_anabled(event, "system_settatus", "Slow_mode"):
             return False
@@ -17,19 +18,9 @@ class SlowModeQueueFilter(BaseFilter):
         if self._user_in_queue(event):
             #TODO: Выдать наказание
 
-            try:
-                self.api.messages.delete(
-                    delete_for_all=1,
-                    peer_id=event.get("peer_id"),
-                    cmids=event.get("cmid")
-                )
-
-            except VkApiError:
-                ...
-
+            self.delete_own_message(event)
             return True
 
-        #TODO: Апдейт при конфликте
         interval = self._get_interval(event)
         query = f"""
         INSERT INTO 

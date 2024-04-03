@@ -1,4 +1,4 @@
-from vk_api import VkApi
+from vk_api import VkApi, VkApiError
 from db import db
 from tools.keyboards import SnackbarAnswer
 from .abc import ABCHandler
@@ -45,6 +45,23 @@ class BaseFilter(ABCHandler):
     def _has_content(event: dict, content_name: str) -> bool:
         content = event.get("attachments")
         return content_name in content
+
+
+    def delete_own_message(self, event):
+        """_summary_
+
+        Args:
+            event (_type_): _description_
+        """
+        try:
+            self.api.messages.delete(
+                delete_for_all=1,
+                peer_id=event.get("peer_id"),
+                cmids=event.get("cmid")
+            )
+
+        except VkApiError:
+            ...
 
 
     async def log(self):
