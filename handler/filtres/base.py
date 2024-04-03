@@ -41,6 +41,12 @@ class BaseFilter(ABCHandler):
         return bool(setting[0][0]) if setting else False
 
 
+    @staticmethod
+    def _has_content(event: dict, content_name: str) -> bool:
+        content = event.get("attachments")
+        return content_name in content
+
+
     async def log(self):
         """Sends a log of command execution
         in log-convs.
