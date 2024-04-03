@@ -36,7 +36,7 @@ class BaseFilter(ABCHandler):
             fields=("setting_status",),
             conv_id=event.get("peer_id"),
             setting_name=setting_name,
-            setting_destination=setting_name
+            setting_destination=setting_destination
         )
 
         return bool(setting[0][0]) if setting else False
