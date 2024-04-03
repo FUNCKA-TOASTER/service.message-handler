@@ -9,7 +9,7 @@ class SlowModeQueueFilter(BaseFilter):
     """
     NAME = "Slow mode queue"
 
-    # TODO: Добавить инор для модерации\администрации\персонала.
+    # TODO: Добавить игнор для модерации\администрации\персонала.
     async def _handle(self, event: dict, kwargs) -> bool:
         if not self._is_anabled(event, "slow_mode", "system"):
             return False
@@ -88,7 +88,7 @@ class ContentFilter(BaseFilter):
         "wall"
     )
 
-    # TODO: Добавить инор для модерации\администрации\персонала.
+    # TODO: Добавить игнор для модерации\администрации\персонала.
     async def _handle(self, event: dict, kwargs) -> bool:
         for content_name in self.CONTENT:
             if not self._is_anabled(event, content_name, "filter"):
