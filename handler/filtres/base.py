@@ -29,14 +29,14 @@ class BaseFilter(ABCHandler):
 
 
     @staticmethod
-    def _is_anabled(event: dict, f_name: str, s_name: str, s_destination: str) -> bool:
+    def _is_anabled(event: dict, setting_name: str, setting_destination: str) -> bool:
         setting = db.execute.select(
             schema="toaster_settings",
-            table=f_name,
-            fields=(f_name,),
+            table="settings",
+            fields=("setting_status",),
             conv_id=event.get("peer_id"),
-            setting_name=s_name,
-            setting_destination=s_destination
+            setting_name=setting_name,
+            setting_destination=setting_name
         )
 
         return bool(setting[0][0]) if setting else False
