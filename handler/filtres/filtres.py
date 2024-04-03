@@ -11,7 +11,7 @@ class SlowModeQueueFilter(BaseFilter):
     NAME = "Slow mode queue"
 
     async def _handle(self, event: dict, kwargs) -> bool:
-        if not self._is_anabled(event):
+        if not self._is_anabled(event, "system_settatus", "Slow_mode"):
             return False
 
         if self._user_in_queue(event):
