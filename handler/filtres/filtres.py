@@ -93,7 +93,7 @@ class ContentFilter(BaseFilter):
     async def _handle(self, event: dict, kwargs) -> bool:
         for content_name in self.CONTENT:
             if self._is_anabled(event, "filter_settatus", content_name):
-                if self._has_content(event, content_name):
+                if self._has_content(event, content_name.lower()):
                     self.NAME = f"Content filter <{content_name}>"
                     #TODO: Выдать наказание
 
