@@ -29,24 +29,15 @@ class BaseFilter(ABCHandler):
 
 
     @staticmethod
-    def _is_anabled(event: dict, field_name: str, setting_name: str) -> bool:
-        if field_name == "system_status":
-            setting = db.execute.select(
-                schema="toaster_settings",
-                table=field_name,
-                fields=(field_name,),
-                conv_id=event.get("peer_id"),
-                system_name=setting_name
-            )
-
-        else:
-            setting = db.execute.select(
-                schema="toaster_settings",
-                table=field_name,
-                fields=(field_name,),
-                conv_id=event.get("peer_id"),
-                filter_name=setting_name
-            )
+    def _is_anabled(event: dict, f_name: str, s_name: str, s_destination: str) -> bool:
+        setting = db.execute.select(
+            schema="toaster_settings",
+            table=f_name,
+            fields=(f_name,),
+            conv_id=event.get("peer_id"),
+            setting_name=s_name,
+            setting_destination=s_destination
+        )
 
         return bool(setting[0][0]) if setting else False
 
@@ -57,12 +48,7 @@ class BaseFilter(ABCHandler):
         return content_name in content
 
 
-    def delete_own_message(self, event):
-        """_summary_
-
-        Args:
-            event (_type_): _description_
-        """
+    def _delete_own_message(self, event):
         try:
             self.api.messages.delete(
                 delete_for_all=1,
