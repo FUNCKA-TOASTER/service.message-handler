@@ -75,26 +75,6 @@ class SlowModeQueueFilter(BaseFilter):
 
 
 # ------------------------------------------------------------------------
-class AppActionFilter(BaseFilter):
-    """Slow mode filter system
-    """
-    NAME = "App action"
-
-    # TODO: Добавить инор для модерации\администрации\персонала.
-    async def _handle(self, event: dict, kwargs) -> bool:
-        if not self._is_anabled(event, "filter_settatus", "App_action"):
-            return False
-
-        if self._has_content(event, "App_action"):
-            #TODO: Выдать наказание
-
-            self.delete_own_message(event)
-            return True
-
-        return False
-
-
-
 class ContentFilter(BaseFilter):
     """Slow mode filter system
     """
