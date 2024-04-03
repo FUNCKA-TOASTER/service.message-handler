@@ -12,7 +12,7 @@ class SlowModeQueueFilter(BaseFilter):
 
     # TODO: Добавить инор для модерации\администрации\персонала.
     async def _handle(self, event: dict, kwargs) -> bool:
-        if not self._is_anabled(event, "system_settatus", "Slow_mode"):
+        if not self._is_anabled(event, "system_status", "Slow_mode"):
             return False
 
         if self._user_in_queue(event):
@@ -92,7 +92,7 @@ class ContentFilter(BaseFilter):
     # TODO: Добавить инор для модерации\администрации\персонала.
     async def _handle(self, event: dict, kwargs) -> bool:
         for content_name in self.CONTENT:
-            if self._is_anabled(event, "filter_settatus", content_name):
+            if self._is_anabled(event, "filter_status", content_name):
                 if self._has_content(event, content_name.lower()):
                     self.NAME = f"Content filter <{content_name}>"
                     #TODO: Выдать наказание
