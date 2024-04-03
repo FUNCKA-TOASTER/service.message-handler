@@ -58,19 +58,6 @@ class SlowModeQueueFilter(BaseFilter):
 
 
     @staticmethod
-    def _is_anabled(event: dict) -> bool:
-        setting = db.execute.select(
-            schema="toaster_settings",
-            table="system_status",
-            fields=("system_status",),
-            conv_id=event.get("peer_id"),
-            system_name="Slow_mode"
-        )
-
-        return bool(setting[0][0]) if setting else False
-
-
-    @staticmethod
     def _user_in_queue(event: dict) -> bool:
         user = db.execute.select(
             schema="toaster",

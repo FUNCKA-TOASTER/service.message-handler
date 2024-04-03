@@ -1,4 +1,5 @@
 from vk_api import VkApi
+from db import db
 from tools.keyboards import SnackbarAnswer
 from .abc import ABCHandler
 
@@ -25,6 +26,19 @@ class BaseFilter(ABCHandler):
             peer_id=event.get("peer_id"),
             event_data=SnackbarAnswer(text).data
         )
+
+
+    @staticmethod
+    def _is_anabled(event: dict, field_name: str, setting_name: str) -> bool:
+        setting = db.execute.select(
+            schema="toaster_settings",
+            table=field_name,
+            fields=(field_name,),
+            conv_id=event.get("peer_id"),
+            system_name=setting_name
+        )
+
+        return bool(setting[0][0]) if setting else False
 
 
     async def log(self):
