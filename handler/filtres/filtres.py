@@ -1,3 +1,6 @@
+import re
+import requests
+import datetime
 from db import db
 from .base import BaseFilter
 
@@ -105,6 +108,68 @@ class OpenPMFilter(BaseFilter):
             return True
 
         return bool(int(info[0].get("can_write_private_message")))
+
+
+
+class AccountAgeFilter(BaseFilter):
+    """Account age filtering system
+    """
+    NAME = "Account Age"
+
+    # TODO: Добавить игнор для модерации\администрации\персонала.
+    async def _handle(self, event: dict, kwargs) -> bool:
+        if not self._is_anabled(event, "account_age", "system"):
+            return False
+
+        if not self._check_date(event):
+            return False
+
+        #TODO: Выдать наказание
+
+        self._delete_own_message(event)
+        return True
+
+
+    def _check_date(self, event: dict) -> bool:
+        pattern = r'<ya:created dc:date=".*"'
+
+        response = requests.get(
+            f"https://vk.com/foaf.php?id={event.get('user_id')}",
+            timeout=50
+        )
+        found = re.findall(pattern, str(response.text))
+
+        if not found:
+            return False
+
+        found = found[0][21:-1]
+        found = found[found.find('\"') + 1:]
+        found = found[:found.find('\"')].replace('T', ' ')
+        found = found[:found.find('+')]
+
+        created_at = datetime.datetime.strptime(found, '%Y-%m-%d %H:%M:%S')
+        current_time = datetime.datetime.now()
+        delta_seconds = (current_time - created_at).total_seconds()
+
+        day_seconds = 60 * 60 * 24
+
+        if delta_seconds < self._get_interval(event) * day_seconds:
+            return True
+
+        return False
+
+
+    @staticmethod
+    def _get_interval(event: dict) -> int:
+        interval = db.execute.select(
+            schema="toaster_settings",
+            table="delay",
+            fields=("delay",),
+            conv_id=event.get("peer_id"),
+            setting_name="account_age"
+        )
+
+        return int(interval[0][0]) if interval else 0
 
 
 
