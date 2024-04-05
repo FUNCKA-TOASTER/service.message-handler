@@ -83,13 +83,10 @@ class OpenPMFilter(BaseFilter):
         if not self._is_anabled(event, "open_pm", "system"):
             return False
 
-        info = await self.api.users.get(
-            event.get("user_id"),
-            fields=["can_write_private_message"]
-        )[0]
+        can_write = self._get_write_status(event)
 
-        if int(info["can_write_private_message"]):
-            return False
+        if can_write:
+            return True
 
         #TODO: Выдать наказание
 
@@ -97,6 +94,16 @@ class OpenPMFilter(BaseFilter):
         return True
 
 
+    def _get_write_status(self, event) -> bool:
+        info = self.api.users.get(
+            event.get("user_id"),
+            fields=["can_write_private_message"]
+        )
+
+        if not info:
+            return True
+
+        return bool(info[0].get("can_write_private_message"))
 
 # ------------------------------------------------------------------------
 class ContentFilter(BaseFilter):
