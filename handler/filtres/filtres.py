@@ -1,5 +1,6 @@
 from db import db
 from .base import BaseFilter
+from logger import logger
 
 
 
@@ -87,9 +88,7 @@ class OpenPMFilter(BaseFilter):
             event.get("user_id"),
             fields=["can_write_private_message"]
         )
-
-        from logger import logger
-        await logger.debug(str(info[0]))
+        await logger.info(str(info))
         if info[0]["can_write_private_message"]:
             return False
 
