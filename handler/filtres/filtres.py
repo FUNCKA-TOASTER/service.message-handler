@@ -73,9 +73,34 @@ class SlowModeQueueFilter(BaseFilter):
 
 
 
+class OpenPMFilter(BaseFilter):
+    """Slow mode filter system
+    """
+    NAME = "Open private messages"
+
+    # TODO: Добавить игнор для модерации\администрации\персонала.
+    async def _handle(self, event: dict, kwargs) -> bool:
+        if not self._is_anabled(event, "open_pm", "system"):
+            return False
+
+        info = await self.api.users.get(
+            event.get("user_id"),
+            fields=["can_write_private_message"]
+        )
+
+        if info[0]["can_write_private_message"]:
+            return False
+
+        #TODO: Выдать наказание
+
+        self._delete_own_message(event)
+        return True
+
+
+
 # ------------------------------------------------------------------------
 class ContentFilter(BaseFilter):
-    """Slow mode filter system
+    """Message content filering
     """
     NAME = "Content filter"
     CONTENT = (
