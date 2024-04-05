@@ -96,7 +96,7 @@ class OpenPMFilter(BaseFilter):
 
     def _get_write_status(self, event) -> bool:
         info = self.api.users.get(
-            event.get("user_id"),
+            user_ids=event.get("user_id"),
             fields=["can_write_private_message"]
         )
 
