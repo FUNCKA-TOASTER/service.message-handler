@@ -1,6 +1,5 @@
 from db import db
 from .base import BaseFilter
-from logger import logger
 
 
 
@@ -87,9 +86,9 @@ class OpenPMFilter(BaseFilter):
         info = await self.api.users.get(
             event.get("user_id"),
             fields=["can_write_private_message"]
-        )
-        await logger.info(str(info))
-        if info[0]["can_write_private_message"]:
+        )[0]
+
+        if int(info["can_write_private_message"]):
             return False
 
         #TODO: Выдать наказание
