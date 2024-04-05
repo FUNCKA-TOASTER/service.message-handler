@@ -86,7 +86,7 @@ class OpenPMFilter(BaseFilter):
         can_write = self._get_write_status(event)
 
         if can_write:
-            return True
+            return False
 
         #TODO: Выдать наказание
 
@@ -103,7 +103,7 @@ class OpenPMFilter(BaseFilter):
         if not info:
             return True
 
-        return bool(info[0].get("can_write_private_message"))
+        return bool(int(info[0].get("can_write_private_message")))
 
 # ------------------------------------------------------------------------
 class ContentFilter(BaseFilter):
