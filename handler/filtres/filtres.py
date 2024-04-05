@@ -153,7 +153,7 @@ class AccountAgeFilter(BaseFilter):
 
         day_seconds = 60 * 60 * 24
 
-        if delta_seconds < self._get_interval(event) * day_seconds:
+        if delta_seconds > self._get_interval(event) * day_seconds:
             return True
 
         return False
