@@ -88,6 +88,8 @@ class OpenPMFilter(BaseFilter):
             fields=["can_write_private_message"]
         )
 
+        from logger import logger
+        await logger.debug(str(info[0]))
         if info[0]["can_write_private_message"]:
             return False
 
