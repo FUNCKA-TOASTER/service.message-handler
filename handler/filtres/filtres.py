@@ -64,9 +64,10 @@ class SlowModeQueueFilter(BaseFilter):
     def _get_interval(event: dict) -> int:
         interval = db.execute.select(
             schema="toaster_settings",
-            table="slow_mode_delay",
+            table="delay",
             fields=("delay",),
-            conv_id=event.get("peer_id")
+            conv_id=event.get("peer_id"),
+            setting_name="slow_mode"
         )
 
         return int(interval[0][0]) if interval else 0
@@ -104,6 +105,8 @@ class OpenPMFilter(BaseFilter):
             return True
 
         return bool(int(info[0].get("can_write_private_message")))
+
+
 
 # ------------------------------------------------------------------------
 class ContentFilter(BaseFilter):
