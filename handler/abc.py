@@ -13,19 +13,18 @@ class ABCHandler(ABC):
 
     Args:
         event (BaseEvent): Modified VKBotLongpoll event.
-        
+
     Returns:
         bool: Handling status. Returns True if was handled.
             True - the event did not trigger anything
             False - if event triggered something, it means event achieved goal
     """
+
     def __init__(self):
         # VK api object
-        self.__api: VkApi = VkApi(
-            token=config.TOKEN,
-            api_version=config.API_VERSION
-        ).get_api() or None
-
+        self.__api: VkApi = (
+            VkApi(token=config.TOKEN, api_version=config.API_VERSION).get_api() or None
+        )
 
     async def __call__(self, event: dict, **kwargs) -> bool:
         """Calls the class as a function,
@@ -38,12 +37,13 @@ class ABCHandler(ABC):
         else:
             event_id = event.get("event_id")
             event_type = event.get("event_type")
-            log_text = f"Unable to handle event <{event_id}|{event_type}>. " \
-                        "Handler does not have an API object."
+            log_text = (
+                f"Unable to handle event <{event_id}|{event_type}>. "
+                "Handler does not have an API object."
+            )
             await logger.info(log_text)
 
         return False
-
 
     @abstractmethod
     async def _handle(self, event: dict, kwargs) -> bool:
@@ -56,7 +56,6 @@ class ABCHandler(ABC):
         Returns:
             bool: Handling status. Returns True if was handled.
         """
-
 
     @property
     def api(self):

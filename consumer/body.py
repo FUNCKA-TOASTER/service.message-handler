@@ -1,5 +1,5 @@
-"""Module "consumer".
-"""
+"""Module "consumer"."""
+
 import json
 import pika
 import config
@@ -10,10 +10,9 @@ class Consumer(object):
     Describes basic connection methods
     and reciving data from RabbitMQ.
     """
+
     connection = pika.BlockingConnection(
-        pika.ConnectionParameters(
-            host=config.QUEUE_BROKER_IP
-        )
+        pika.ConnectionParameters(host=config.QUEUE_BROKER_IP)
     )
     channel = connection.channel()
 
@@ -35,13 +34,10 @@ class Consumer(object):
 
             yield json.loads(decoded)
 
-
     @staticmethod
     def _serialize(string: str) -> bytes:
         return string.encode("utf-8")
 
-
     @staticmethod
     def _deserialize(byte_string: bytes) -> str:
         return byte_string.decode("utf-8")
- 

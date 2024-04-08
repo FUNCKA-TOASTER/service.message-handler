@@ -1,27 +1,20 @@
-"""Module "db"
-"""
+"""Module "db" """
 
 
 class Executer(object):
     """Class providing functions
     for basic SQL queries.
     """
-    _ops = {
-        '__le': '<=',
-        '__lt': '<',
-        '__ge': '>=',
-        '__gt': '>',
-        '__nt': '!='
-    }
+
+    _ops = {"__le": "<=", "__lt": "<", "__ge": ">=", "__gt": ">", "__nt": "!="}
 
     def __init__(self, connection, cursor):
         self.con = connection
         self.cur = cursor
 
-
-    def select(self, schema:str, table: str,  fields: tuple = None, **rows) -> tuple:
+    def select(self, schema: str, table: str, fields: tuple = None, **rows) -> tuple:
         """
-        Accepts arguments for fields, comparisons, etc., 
+        Accepts arguments for fields, comparisons, etc.,
         forms a database select query from them and returns the result of its execution.
         Keys that mimic comparison operators:
             1) __le -> <= \n
@@ -41,38 +34,37 @@ class Executer(object):
             str: MySQL query string.
         """
         if fields:
-            summary_fields = ', '.join(fields)
+            summary_fields = ", ".join(fields)
         else:
-            summary_fields = '*'
+            summary_fields = "*"
 
         query = f"SELECT {summary_fields} FROM {table}"
 
         if rows:
-            summary_rows = ' AND '.join(self._get_ratio(rows))
+            summary_rows = " AND ".join(self._get_ratio(rows))
             query += f" WHERE {summary_rows}"
 
         query += ";"
 
-        self.cur.execute(f'USE {schema};')
+        self.cur.execute(f"USE {schema};")
         self.cur.execute(query)
         result = self.cur.fetchall()
         return result
 
-
-    def insert(self, schema:str, table: str, on_duplicate=None, **rows):
+    def insert(self, schema: str, table: str, on_duplicate=None, **rows):
         """
-        Takes arguments for fields, comparisons, etc., 
+        Takes arguments for fields, comparisons, etc.,
         forms a database insert query from them and inserts data when it is executed.
 
         Args:
-            on_duplicate (str, optional): On duplicate action. 
+            on_duplicate (str, optional): On duplicate action.
             Can be "ignore" or "update". Defaults to None.
         """
         if not rows:
             return
 
-        summary_keys = ', '.join(rows.keys())  # Might be incorrect
-        summary_values = ', '.join([f"'{value}'" for value in rows.values()])
+        summary_keys = ", ".join(rows.keys())  # Might be incorrect
+        summary_values = ", ".join([f"'{value}'" for value in rows.values()])
         query = f""" INSERT INTO {table} ({summary_keys})
                      VALUES ({summary_values})
                 """
@@ -88,11 +80,10 @@ class Executer(object):
 
         query += ";"
 
-        self.cur.execute(f'USE {schema};')
+        self.cur.execute(f"USE {schema};")
         self.cur.execute(query)
 
-
-    def update(self, schema:str, table: str, new_data: dict, **rows):
+    def update(self, schema: str, table: str, new_data: dict, **rows):
         """
         Accepts arguments for fields, comparisons, etc.,
         forms a query from them to update the database
@@ -114,21 +105,21 @@ class Executer(object):
         if not new_data:
             return
 
-        summary_fields = ', '.join(
-            [f"{key}='{value}'" for key, value in new_data.items()])
+        summary_fields = ", ".join(
+            [f"{key}='{value}'" for key, value in new_data.items()]
+        )
         query = f"UPDATE {table} SET {summary_fields}"
 
         if rows:
-            summary_rows = ' AND '.join(self._get_ratio(rows))
+            summary_rows = " AND ".join(self._get_ratio(rows))
             query += f" WHERE {summary_rows}"
 
         query += ";"
 
-        self.cur.execute(f'USE {schema};')
+        self.cur.execute(f"USE {schema};")
         self.cur.execute(query)
 
-
-    def delete(self, schema:str, table: str, **rows):
+    def delete(self, schema: str, table: str, **rows):
         """
         Takes arguments for fields, comparisons, etc.,
         forms a request from them to delete from the
@@ -147,16 +138,15 @@ class Executer(object):
         query = f"DELETE FROM {table}"
 
         if rows:
-            summary_rows = ' AND '.join(self._get_ratio(rows))
+            summary_rows = " AND ".join(self._get_ratio(rows))
             query += f" WHERE {summary_rows}"
 
         query += ";"
 
-        self.cur.execute(f'USE {schema};')
+        self.cur.execute(f"USE {schema};")
         self.cur.execute(query)
 
-
-    def raw(self, schema:str, query:str):
+    def raw(self, schema: str, query: str):
         """Raw query executer.
 
         Args:
@@ -166,11 +156,10 @@ class Executer(object):
         Returns:
             object: MySQL cursor object.
         """
-        self.cur.execute(f'USE {schema};')
+        self.cur.execute(f"USE {schema};")
         self.cur.execute(query)
 
         return self.cur
-
 
     def _get_ratio(self, rows: dict) -> list:
         """
@@ -187,10 +176,10 @@ class Executer(object):
         """
         summary = []
         for key, value in rows.items():
-            op = key[-4:-1]+key[-1]
-            op = self._ops.get(op, '=')
+            op = key[-4:-1] + key[-1]
+            op = self._ops.get(op, "=")
 
-            if op != '=':
+            if op != "=":
                 key = key[0:-4]
 
             summary.append(f"{key} {op} '{value}'")

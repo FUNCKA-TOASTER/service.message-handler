@@ -15,6 +15,7 @@ class ABCHandler(ABC):
             True - handler triggered
             False - handler skiped
     """
+
     @abstractmethod
     async def _handle(self, event: dict, kwargs) -> bool:
         """Handling a custom event that returns the result of processing.
@@ -27,7 +28,6 @@ class ABCHandler(ABC):
         Returns:
             bool: Handling status. Returns True if was handled.
         """
-
 
     async def __call__(self, event: dict, **kwargs) -> bool:
         """Calls the class as a function,

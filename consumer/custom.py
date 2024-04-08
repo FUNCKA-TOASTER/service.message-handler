@@ -7,8 +7,8 @@ class CustomConsumer(Consumer):
     functions for working with data that recived
     from a queue inside RabbitMQ.
     """
-    # Write custom functions under this line
 
+    # Write custom functions under this line
 
 
 consumer = CustomConsumer()

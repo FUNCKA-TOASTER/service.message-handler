@@ -2,18 +2,22 @@ from logger import logger
 from .abc import ABCHandler
 from .filtres import filter_list
 
+
 class MessageHandler(ABCHandler):
     """Event handler class that recognizes commands
     in the message and executing attached to each command
     actions.
     """
+
     async def _handle(self, event: dict, kwargs) -> bool:
-        if not any((
-            event.get("text", False),
-            event.get("attachments", False),
-            event.get("reply", False),
-            event.get("forward", False)
-        )):
+        if not any(
+            (
+                event.get("text", False),
+                event.get("attachments", False),
+                event.get("reply", False),
+                event.get("forward", False),
+            )
+        ):
             log_text = f"Missing message content <{event.get('event_id')}>"
             await logger.info(log_text)
 
@@ -25,7 +29,7 @@ class MessageHandler(ABCHandler):
             selected = filt(super().api)
             result = await selected(event)
             if result:
-                log_text += f"triggered \"{selected.NAME}\" filter."
+                log_text += f'triggered "{selected.NAME}" filter.'
                 await logger.info(log_text)
                 return result
 
@@ -33,7 +37,6 @@ class MessageHandler(ABCHandler):
 
         await logger.info(log_text)
         return False
-
 
 
 message_handler = MessageHandler()

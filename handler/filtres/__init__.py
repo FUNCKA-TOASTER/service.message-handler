@@ -1,9 +1,4 @@
-from .filtres import (
-    SlowModeQueueFilter,
-    ContentFilter,
-    OpenPMFilter,
-    AccountAgeFilter
-)
+from .filtres import SlowModeQueueFilter, ContentFilter, OpenPMFilter, AccountAgeFilter
 
 # Filter in order of priority of execution
 filter_list = [
@@ -14,7 +9,4 @@ filter_list = [
 ]
 
 
-
-__all__ = (
-    "filter_list",
-)
+__all__ = ("filter_list",)

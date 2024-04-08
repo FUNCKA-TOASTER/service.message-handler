@@ -4,9 +4,8 @@ About:
     bot by using ORM. Supports basic queries,
     as well as custom presets.
 """
+
 from .database import db
 
 
-__all__ = (
-    "db",
-)
+__all__ = ("db",)

@@ -5,11 +5,10 @@ from db import db
 from .base import BaseFilter
 
 
-
 # ------------------------------------------------------------------------
 class SlowModeQueueFilter(BaseFilter):
-    """Slow mode filter system
-    """
+    """Slow mode filter system"""
+
     NAME = "Slow mode queue"
 
     # TODO: Добавить игнор для модерации\администрации\персонала.
@@ -18,7 +17,7 @@ class SlowModeQueueFilter(BaseFilter):
             return False
 
         if self._user_in_queue(event):
-            #TODO: Выдать наказание
+            # TODO: Выдать наказание
 
             self._delete_own_message(event)
             return True
@@ -42,13 +41,9 @@ class SlowModeQueueFilter(BaseFilter):
             );
         """
 
-        db.execute.raw(
-            schema="toaster",
-            query=query
-        )
+        db.execute.raw(schema="toaster", query=query)
 
         return True
-
 
     @staticmethod
     def _user_in_queue(event: dict) -> bool:
@@ -57,11 +52,10 @@ class SlowModeQueueFilter(BaseFilter):
             table="slow_mode_queue",
             fields=("user_name",),
             conv_id=event.get("peer_id"),
-            user_id=event.get("user_id")
+            user_id=event.get("user_id"),
         )
 
         return bool(user)
-
 
     @staticmethod
     def _get_interval(event: dict) -> int:
@@ -70,16 +64,15 @@ class SlowModeQueueFilter(BaseFilter):
             table="delay",
             fields=("delay",),
             conv_id=event.get("peer_id"),
-            setting_name="slow_mode"
+            setting_name="slow_mode",
         )
 
         return int(interval[0][0]) if interval else 0
 
 
-
 class OpenPMFilter(BaseFilter):
-    """Slow mode filter system
-    """
+    """Slow mode filter system"""
+
     NAME = "Open private messages"
 
     # TODO: Добавить игнор для модерации\администрации\персонала.
@@ -92,16 +85,14 @@ class OpenPMFilter(BaseFilter):
         if can_write:
             return False
 
-        #TODO: Выдать наказание
+        # TODO: Выдать наказание
 
         self._delete_own_message(event)
         return True
 
-
     def _get_write_status(self, event) -> bool:
         info = self.api.users.get(
-            user_ids=event.get("user_id"),
-            fields=["can_write_private_message"]
+            user_ids=event.get("user_id"), fields=["can_write_private_message"]
         )
 
         if not info:
@@ -110,10 +101,9 @@ class OpenPMFilter(BaseFilter):
         return bool(int(info[0].get("can_write_private_message")))
 
 
-
 class AccountAgeFilter(BaseFilter):
-    """Account age filtering system
-    """
+    """Account age filtering system"""
+
     NAME = "Account Age"
 
     # TODO: Добавить игнор для модерации\администрации\персонала.
@@ -124,18 +114,16 @@ class AccountAgeFilter(BaseFilter):
         if not self._check_date(event):
             return False
 
-        #TODO: Выдать наказание
+        # TODO: Выдать наказание
 
         self._delete_own_message(event)
         return True
-
 
     def _check_date(self, event: dict) -> bool:
         pattern = r'<ya:created dc:date=".*"'
 
         response = requests.get(
-            f"https://vk.com/foaf.php?id={event.get('user_id')}",
-            timeout=50
+            f"https://vk.com/foaf.php?id={event.get('user_id')}", timeout=50
         )
         found = re.findall(pattern, str(response.text))
 
@@ -143,11 +131,11 @@ class AccountAgeFilter(BaseFilter):
             return False
 
         found = found[0][21:-1]
-        found = found[found.find('\"') + 1:]
-        found = found[:found.find('\"')].replace('T', ' ')
-        found = found[:found.find('+')]
+        found = found[found.find('"') + 1 :]
+        found = found[: found.find('"')].replace("T", " ")
+        found = found[: found.find("+")]
 
-        created_at = datetime.datetime.strptime(found, '%Y-%m-%d %H:%M:%S')
+        created_at = datetime.datetime.strptime(found, "%Y-%m-%d %H:%M:%S")
         current_time = datetime.datetime.now()
         delta_seconds = (current_time - created_at).total_seconds()
 
@@ -158,7 +146,6 @@ class AccountAgeFilter(BaseFilter):
 
         return False
 
-
     @staticmethod
     def _get_interval(event: dict) -> int:
         interval = db.execute.select(
@@ -166,26 +153,31 @@ class AccountAgeFilter(BaseFilter):
             table="delay",
             fields=("delay",),
             conv_id=event.get("peer_id"),
-            setting_name="account_age"
+            setting_name="account_age",
         )
 
         return int(interval[0][0]) if interval else 0
 
 
-
 # ------------------------------------------------------------------------
 class ContentFilter(BaseFilter):
-    """Message content filering
-    """
+    """Message content filering"""
+
     NAME = "Content filter"
     CONTENT = (
-        "app_action", "audio",
-        "audio_message", "doc",
-        "forward", "reply",
-        "graffiti", "sticker",
-        "link", "photo",
-        "poll", "video",
-        "wall"
+        "app_action",
+        "audio",
+        "audio_message",
+        "doc",
+        "forward",
+        "reply",
+        "graffiti",
+        "sticker",
+        "link",
+        "photo",
+        "poll",
+        "video",
+        "wall",
     )
 
     # TODO: Добавить игнор для модерации\администрации\персонала.
@@ -194,7 +186,7 @@ class ContentFilter(BaseFilter):
             if not self._is_anabled(event, content_name, "filter"):
                 if self._has_content(event, content_name):
                     self.NAME = f"Content filter <{content_name}>"
-                    #TODO: Выдать наказание
+                    # TODO: Выдать наказание
 
                     self._delete_own_message(event)
                     return True

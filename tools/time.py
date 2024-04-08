@@ -3,12 +3,9 @@ About:
     A range of features for convenience
     receiving time according to Moscow time.
 """
+
 import time
-from datetime import (
-    timedelta,
-    timezone,
-    datetime
-)
+from datetime import timedelta, timezone, datetime
 
 
 def timestamp() -> int:
@@ -24,14 +21,14 @@ def timestamp() -> int:
 
 
 def time_zone() -> timezone:
-    """Returns the Object of the datetime 
+    """Returns the Object of the datetime
     time zone Moscow (UTC +3).
 
     Returns:
         timezone: Moscow time zone object.
     """
     offset = timedelta(hours=3)
-    tz = timezone(offset, name='MSK')
+    tz = timezone(offset, name="MSK")
 
     return tz
 
@@ -43,18 +40,17 @@ def msk_now() -> str:
     Returns:
         str: _description_
     """
-    msk_time = str(datetime.fromtimestamp(
-        timestamp(),
-        tz=time_zone()
-    )).split('+', maxsplit=-1)[0]
+    msk_time = str(datetime.fromtimestamp(timestamp(), tz=time_zone())).split(
+        "+", maxsplit=-1
+    )[0]
 
-    if msk_time.find('.') != -1:
-        msk_time = msk_time[0:msk_time.find('.')]
+    if msk_time.find(".") != -1:
+        msk_time = msk_time[0 : msk_time.find(".")]
 
     return msk_time
 
 
-def msk_delta(hours: int = 0, minutes: int = 0, seconds: int =0) -> str:
+def msk_delta(hours: int = 0, minutes: int = 0, seconds: int = 0) -> str:
     """Returns the line with the
     delta Moscow datetime.
 
@@ -66,20 +62,13 @@ def msk_delta(hours: int = 0, minutes: int = 0, seconds: int =0) -> str:
     Returns:
         str: _description_
     """
-    delta = timedelta(
-        hours=hours,
-        minutes=minutes,
-        seconds=seconds
-    )
+    delta = timedelta(hours=hours, minutes=minutes, seconds=seconds)
 
-    msk_time = datetime.fromtimestamp(
-        timestamp(),
-        tz=time_zone()
-    )
+    msk_time = datetime.fromtimestamp(timestamp(), tz=time_zone())
     msk_time += delta
-    msk_time = str(msk_time).split('+', maxsplit=-1)[0]
+    msk_time = str(msk_time).split("+", maxsplit=-1)[0]
 
-    if msk_time.find('.') != -1:
-        msk_time = msk_time[0:msk_time.find('.')]
+    if msk_time.find(".") != -1:
+        msk_time = msk_time[0 : msk_time.find(".")]
 
     return msk_time

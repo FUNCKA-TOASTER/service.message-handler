@@ -1,20 +1,9 @@
-"""VK keyboard builder module.
-"""
+"""VK keyboard builder module."""
+
 from .color import ButtonColor
 from .keyboard import Keyboard
-from .action import (
-    Text,
-    OpenLink,
-    OpenApp,
-    Location,
-    VKPay,
-    Callback
-)
-from .answer import (
-    SnackbarAnswer,
-    AppAnswer,
-    LinkAnswer
-)
+from .action import Text, OpenLink, OpenApp, Location, VKPay, Callback
+from .answer import SnackbarAnswer, AppAnswer, LinkAnswer
 
 
 __all__ = (
@@ -28,5 +17,5 @@ __all__ = (
     "Callback",
     "SnackbarAnswer",
     "AppAnswer",
-    "LinkAnswer"
+    "LinkAnswer",
 )

@@ -1,5 +1,5 @@
-"""Module "config".
-"""
+"""Module "config"."""
+
 import os
 
 SERVICE_NAME = "toaster.message-handling-service"

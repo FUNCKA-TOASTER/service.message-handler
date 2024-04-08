@@ -1,8 +1,6 @@
-"""_summary_
-"""
+"""_summary_"""
+
 from .handler import message_handler
 
 
-__all__ = (
-    "message_handler",
-)
+__all__ = ("message_handler",)

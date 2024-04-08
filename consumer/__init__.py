@@ -5,9 +5,8 @@ About:
     and getting the byte data in JSON formats
     string.
 """
+
 from .custom import consumer
 
 
-__all__ = (
-    "consumer",
-)
+__all__ = ("consumer",)

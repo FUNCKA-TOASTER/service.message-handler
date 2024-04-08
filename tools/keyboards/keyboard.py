@@ -1,5 +1,5 @@
-"""Description of the VK keyboard class file.
-"""
+"""Description of the VK keyboard class file."""
+
 import json
 from .button import Button
 from .action import BaseAction
@@ -7,15 +7,13 @@ from .color import ButtonColor
 
 
 class Keyboard(object):
-    """VK keyboard builder class.
-    """
+    """VK keyboard builder class."""
 
     def __init__(self, inline: bool, one_time: bool, owner_id: int):
         self.owner_id = owner_id
         self.inline: bool = inline
         self.one_time: bool = one_time
         self.buttons: list = []
-
 
     def add_row(self):
         """Adds a new line for placing buttons.
@@ -32,12 +30,13 @@ class Keyboard(object):
             raise ValueError("The maximum count of rows has been exceeded.")
 
         if self.buttons and not self.buttons[-1]:
-            raise RuntimeError("Cannot create a new row while the previous row is empty.")
+            raise RuntimeError(
+                "Cannot create a new row while the previous row is empty."
+            )
 
         self.buttons.append([])
 
         return self
-
 
     def add_button(self, action: BaseAction, color: ButtonColor):
         """_summary_
@@ -60,23 +59,21 @@ class Keyboard(object):
 
         return self
 
-
     @property
     def as_dict(self) -> dict:
         body = {
             "one_time": self.one_time,
             "inline": self.inline,
-            "buttons": self.buttons
+            "buttons": self.buttons,
         }
 
         return body
-
 
     @property
     def json(self) -> str:
         """Converts keyboard object fields to
         JSON string.
-        
+
         Returns:
             str: JSON dumped string.
         """
