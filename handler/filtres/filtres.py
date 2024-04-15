@@ -7,11 +7,8 @@ from .base import BaseFilter
 
 # ------------------------------------------------------------------------
 class SlowModeQueueFilter(BaseFilter):
-    """Slow mode filter system"""
-
     NAME = "Slow mode queue"
 
-    # TODO: Добавить игнор для модерации\администрации\персонала.
     async def _handle(self, event: dict, kwargs) -> bool:
         if not self._is_anabled(event, "slow_mode", "system"):
             return False
@@ -71,11 +68,8 @@ class SlowModeQueueFilter(BaseFilter):
 
 
 class OpenPMFilter(BaseFilter):
-    """Slow mode filter system"""
-
     NAME = "Open private messages"
 
-    # TODO: Добавить игнор для модерации\администрации\персонала.
     async def _handle(self, event: dict, kwargs) -> bool:
         if not self._is_anabled(event, "open_pm", "system"):
             return False
@@ -102,11 +96,8 @@ class OpenPMFilter(BaseFilter):
 
 
 class AccountAgeFilter(BaseFilter):
-    """Account age filtering system"""
-
     NAME = "Account Age"
 
-    # TODO: Добавить игнор для модерации\администрации\персонала.
     async def _handle(self, event: dict, kwargs) -> bool:
         if not self._is_anabled(event, "account_age", "system"):
             return False
@@ -161,8 +152,6 @@ class AccountAgeFilter(BaseFilter):
 
 # ------------------------------------------------------------------------
 class ContentFilter(BaseFilter):
-    """Message content filering"""
-
     NAME = "Content filter"
     CONTENT = (
         "app_action",
@@ -180,7 +169,6 @@ class ContentFilter(BaseFilter):
         "wall",
     )
 
-    # TODO: Добавить игнор для модерации\администрации\персонала.
     async def _handle(self, event: dict, kwargs) -> bool:
         for content_name in self.CONTENT:
             if not self._is_anabled(event, content_name, "filter"):

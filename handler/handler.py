@@ -1,15 +1,17 @@
 from logger import logger
+from db import db
 from .abc import ABCHandler
 from .filtres import filter_list
 
 
 class MessageHandler(ABCHandler):
-    """Event handler class that recognizes commands
-    in the message and executing attached to each command
-    actions.
-    """
-
     async def _handle(self, event: dict, kwargs) -> bool:
+        if await self._get_userlvl(event) > 0:
+            log_text = "Ignoring messages from staff."
+            await logger.info(log_text)
+
+            return False
+
         if not any(
             (
                 event.get("text", False),
@@ -37,6 +39,31 @@ class MessageHandler(ABCHandler):
 
         await logger.info(log_text)
         return False
+
+    async def _get_userlvl(self, event: dict) -> int:
+        tech_admin = db.execute.select(
+            schema="toaster_settings",
+            table="staff",
+            fields=("user_id",),
+            user_id=event.get("user_id"),
+            staff_role="TECH",
+        )
+
+        if bool(tech_admin):
+            if event.get("user_id") == tech_admin[0][0]:
+                return 2
+
+        user_lvl = db.execute.select(
+            schema="toaster",
+            table="permissions",
+            fields=("user_permission",),
+            conv_id=event.get("peer_id"),
+        )
+
+        if bool(user_lvl):
+            return int(user_lvl[0][0])
+
+        return 0
 
 
 message_handler = MessageHandler()
