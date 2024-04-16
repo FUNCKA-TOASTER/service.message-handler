@@ -184,11 +184,11 @@ class URLFilter(BaseFilter):
     def _get_urls(self, text) -> set:
         pattern = r"(https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)?)"
         result = re.findall(pattern, text)
-        return [url[0] for url in result]
+        return {url[0] for url in result}
 
     def _get_domains(self, url_list) -> set:
         pattern = r"(?<=://)(.*?)(?=\/)"
-        return [re.findall(pattern, url)[0] for url in url_list]
+        return {re.findall(pattern, url)[0] for url in url_list}
 
     def _get_from_db(self, event, pattern_type, pattern_status) -> set:
         content = db.execute.select(
