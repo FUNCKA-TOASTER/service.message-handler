@@ -14,8 +14,7 @@ class SlowModeQueueFilter(BaseFilter):
             return False
 
         if self._user_in_queue(event):
-            # TODO: Выдать наказание
-
+            # TODO: Заменить на обращение к сервесу наказаний.
             self._delete_own_message(event)
             return True
 
@@ -79,8 +78,7 @@ class OpenPMFilter(BaseFilter):
         if can_write:
             return False
 
-        # TODO: Выдать наказание
-
+        # TODO: Заменить на обращение к сервесу наказаний.
         self._delete_own_message(event)
         return True
 
@@ -105,8 +103,7 @@ class AccountAgeFilter(BaseFilter):
         if not self._check_date(event):
             return False
 
-        # TODO: Выдать наказание
-
+        # TODO: Заменить на обращение к сервесу наказаний.
         self._delete_own_message(event)
         return True
 
@@ -150,6 +147,89 @@ class AccountAgeFilter(BaseFilter):
         return int(interval[0][0]) if interval else 0
 
 
+# TODO: доделать
+class URLFilter(BaseFilter):
+    NAME = "URL filter"
+
+    async def _handle(self, event: dict, kwargs) -> bool:
+        if not self._is_anabled(event, "url_filtering", "system"):
+            return False
+
+        hard_mode = self._is_anabled(event, "hard_url_filtering", "system")
+
+        urls = self._get_urls(event.get("text"))
+        domains = self._get_domains(urls)
+
+        forbidden_domains = self._get_from_db(event, "domain", "forbidden")
+        forbodden_urls = self._get_from_db(event, "url", "forbidden")
+
+        if urls.intersection(forbodden_urls) or domains.intersection(forbidden_domains):
+            # TODO: Заменить на обращение к сервесу наказаний.
+            self._delete_own_message(event)
+            return True
+
+        if hard_mode:
+            allowed_domains = self._get_from_db(event, "domain", "allowed")
+            allowed_urls = self._get_from_db(event, "url", "allowed")
+
+            if not (
+                urls.isdisjoint(allowed_urls) and domains.isdisjoint(allowed_domains)
+            ):
+                # TODO: Заменить на обращение к сервесу наказаний.
+                self._delete_own_message(event)
+                return True
+
+        return False
+
+    def _get_urls(self, text) -> set:
+        pattern = r"(https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)?)"
+        result = re.findall(pattern, text)
+        return [url[0] for url in result]
+
+    def _get_domains(self, url_list) -> set:
+        pattern = r"(?<=://)(.*?)(?=\/)"
+        return [re.findall(pattern, url)[0] for url in url_list]
+
+    def _get_from_db(self, event, pattern_type, pattern_status) -> set:
+        db.execute.select(
+            schema="toaster_settings",
+            table="curse_words",
+            fields=("pattern",),
+            conv_id=event.get("peer_id"),
+            type=pattern_type,
+            status=pattern_status,
+        )
+
+
+class CurseWordsFilter(BaseFilter):
+    NAME = "Curse words filter"
+
+    async def _handle(self, event: dict, kwargs) -> bool:
+        if not self._is_anabled(event, "curse_words", "system"):
+            return False
+
+        found = self._get_urls(event)
+
+        if not found:
+            return False
+
+        # TODO: Заменить на обращение к сервесу наказаний.
+        self._delete_own_message(event)
+        return True
+
+    async def _find_curse(self, event) -> bool:
+        word_list = db.execute.select(
+            schema="toaster_settings",
+            table="curse_words",
+            fields=("word",),
+            conv_id=event.get("peer_id"),
+        )
+
+        for word in word_list:
+            pattern = rf"\b{word[0]}\b"
+            return bool(re.findall(pattern, event.get("text")))
+
+
 # ------------------------------------------------------------------------
 class ContentFilter(BaseFilter):
     NAME = "Content filter"
@@ -174,8 +254,8 @@ class ContentFilter(BaseFilter):
             if not self._is_anabled(event, content_name, "filter"):
                 if self._has_content(event, content_name):
                     self.NAME = f"Content filter <{content_name}>"
-                    # TODO: Выдать наказание
 
+                    # TODO: Заменить на обращение к сервесу наказаний.
                     self._delete_own_message(event)
                     return True
 

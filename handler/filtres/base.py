@@ -44,6 +44,7 @@ class BaseFilter(ABCHandler):
         content = event.get("attachments")
         return content_name in content
 
+    # TODO: перенести удаление сообщения в микросервис по выдаче наказаний
     def _delete_own_message(self, event):
         try:
             self.api.messages.delete(
