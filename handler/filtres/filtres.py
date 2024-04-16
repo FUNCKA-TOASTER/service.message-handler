@@ -191,7 +191,7 @@ class URLFilter(BaseFilter):
         return [re.findall(pattern, url)[0] for url in url_list]
 
     def _get_from_db(self, event, pattern_type, pattern_status) -> set:
-        db.execute.select(
+        content = db.execute.select(
             schema="toaster_settings",
             table="curse_words",
             fields=("pattern",),
@@ -199,6 +199,8 @@ class URLFilter(BaseFilter):
             type=pattern_type,
             status=pattern_status,
         )
+
+        return {c[0] for c in content}
 
 
 class CurseWordsFilter(BaseFilter):
