@@ -193,7 +193,7 @@ class URLFilter(BaseFilter):
     def _get_from_db(self, event, pattern_type, pattern_status) -> set:
         content = db.execute.select(
             schema="toaster_settings",
-            table="curse_words",
+            table="url_filter",
             fields=("pattern",),
             conv_id=event.get("peer_id"),
             type=pattern_type,
