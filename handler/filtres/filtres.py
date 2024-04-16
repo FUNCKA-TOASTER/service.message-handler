@@ -172,9 +172,7 @@ class URLFilter(BaseFilter):
             allowed_domains = self._get_from_db(event, "domain", "allowed")
             allowed_urls = self._get_from_db(event, "url", "allowed")
 
-            if not (
-                urls.isdisjoint(allowed_urls) and domains.isdisjoint(allowed_domains)
-            ):
+            if urls - allowed_urls or domains - allowed_domains:
                 # TODO: Заменить на обращение к сервесу наказаний.
                 self._delete_own_message(event)
                 return True
