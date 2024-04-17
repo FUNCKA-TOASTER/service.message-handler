@@ -256,7 +256,7 @@ class ContentFilter(BaseFilter):
 
     async def _handle(self, event: dict, kwargs) -> bool:
         for content_name in self.CONTENT:
-            if not self._is_anabled(event, content_name, "filter"):
+            if not await self._is_anabled(event, content_name, "filter"):
                 if await self._has_content(event, content_name):
                     self.NAME = f"Content filter <{content_name}>"
 
