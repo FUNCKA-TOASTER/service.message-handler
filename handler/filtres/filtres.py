@@ -208,7 +208,7 @@ class CurseWordsFilter(BaseFilter):
         if not self._is_anabled(event, "curse_words", "system"):
             return False
 
-        found = self._find_curse(event)
+        found = await self._find_curse(event)
 
         if not found:
             return False
