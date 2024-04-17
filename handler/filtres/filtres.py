@@ -2,6 +2,7 @@ import re
 import requests
 import datetime
 from db import db
+from producer import producer
 from .base import BaseFilter
 
 
@@ -14,8 +15,9 @@ class SlowModeQueueFilter(BaseFilter):
             return False
 
         if await self._user_in_queue(event):
-            # TODO: Заменить на обращение к сервису наказаний.
-            await self._delete_own_message(event)
+            await producer.initiate_warn(
+                event=event, message="соблюдай интервал сообщений!", setting="slow_mode"
+            )
             return True
 
         interval = await self._get_interval(event)
@@ -78,8 +80,9 @@ class OpenPMFilter(BaseFilter):
         if can_write:
             return False
 
-        # TODO: Заменить на обращение к сервису наказаний.
-        await self._delete_own_message(event)
+        await producer.initiate_warn(
+            event=event, message="открой личные сообщения!", setting="open_pm"
+        )
         return True
 
     async def _get_write_status(self, event) -> bool:
@@ -103,8 +106,9 @@ class AccountAgeFilter(BaseFilter):
         if not await self._check_date(event):
             return False
 
-        # TODO: Заменить на обращение к сервису наказаний.
-        await self._delete_own_message(event)
+        await producer.initiate_warn(
+            event=event, message="твой аккаунт слишком молод!", setting="account_age"
+        )
         return True
 
     async def _check_date(self, event: dict) -> bool:
@@ -148,7 +152,6 @@ class AccountAgeFilter(BaseFilter):
         return int(interval[0][0]) if interval else 0
 
 
-# TODO: доделать
 class URLFilter(BaseFilter):
     NAME = "URL filter"
 
@@ -165,8 +168,11 @@ class URLFilter(BaseFilter):
         forbodden_urls = await self._get_from_db(event, "url", "forbidden")
 
         if urls.intersection(forbodden_urls) or domains.intersection(forbidden_domains):
-            # TODO: Заменить на обращение к сервису наказаний.
-            await self._delete_own_message(event)
+            await producer.initiate_warn(
+                event=event,
+                message="не присылай опасные ссылки!",
+                setting="url_filtering",
+            )
             return True
 
         if hard_mode:
@@ -174,8 +180,11 @@ class URLFilter(BaseFilter):
             allowed_urls = await self._get_from_db(event, "url", "allowed")
 
             if urls - allowed_urls or domains - allowed_domains:
-                # TODO: Заменить на обращение к сервису наказаний.
-                await self._delete_own_message(event)
+                await producer.initiate_warn(
+                    event=event,
+                    message="не присылай подозрительные ссылки!",
+                    setting="hard_url_filtering",
+                )
                 return True
 
         return False
@@ -214,8 +223,11 @@ class CurseWordsFilter(BaseFilter):
         if not found:
             return False
 
-        # TODO: Заменить на обращение к сервису наказаний.
-        await self._delete_own_message(event)
+        await producer.initiate_warn(
+            event=event,
+            message="это слово запрещено!",
+            setting="curse_words",
+        )
         return True
 
     async def _find_curse(self, event) -> bool:
@@ -259,8 +271,11 @@ class ContentFilter(BaseFilter):
                 if await self._has_content(event, content_name):
                     self.NAME = f"Content filter <{content_name}>"
 
-                    # TODO: Заменить на обращение к сервису наказаний.
-                    self._delete_own_message(event)
+                    await producer.initiate_warn(
+                        event=event,
+                        message="этот контент запрещен!",
+                        setting=content_name,
+                    )
                     return True
 
         return False

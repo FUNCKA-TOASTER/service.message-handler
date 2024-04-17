@@ -46,16 +46,6 @@ class BaseFilter(ABCHandler):
         content = event.get("attachments")
         return content_name in content
 
-    # TODO: перенести удаление сообщения в микросервис по выдаче наказаний
-    async def _delete_own_message(self, event):
-        try:
-            self.api.messages.delete(
-                delete_for_all=1, peer_id=event.get("peer_id"), cmids=event.get("cmid")
-            )
-
-        except VkApiError:
-            ...
-
     async def log(self):
         """Sends a log of command execution
         in log-convs.
