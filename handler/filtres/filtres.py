@@ -100,14 +100,14 @@ class AccountAgeFilter(BaseFilter):
         if not await self._is_anabled(event, "account_age", "system"):
             return False
 
-        if not self._check_date(event):
+        if not await self._check_date(event):
             return False
 
         # TODO: Заменить на обращение к сервису наказаний.
         await self._delete_own_message(event)
         return True
 
-    def _check_date(self, event: dict) -> bool:
+    async def _check_date(self, event: dict) -> bool:
         pattern = r'<ya:created dc:date=".*"'
 
         response = requests.get(
