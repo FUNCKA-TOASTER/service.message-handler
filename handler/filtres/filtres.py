@@ -229,6 +229,8 @@ class CurseWordsFilter(BaseFilter):
             pattern = rf"\b{word[0]}\b"
             return bool(re.findall(pattern, event.get("text").lower()))
 
+        return False
+
 
 # ------------------------------------------------------------------------
 class ContentFilter(BaseFilter):
