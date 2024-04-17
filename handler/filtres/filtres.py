@@ -231,7 +231,6 @@ class CurseWordsFilter(BaseFilter):
 
         for word in word_list:
             pattern = rf"\b{word[0]}\b"
-            self.NAME = pattern
             return bool(re.findall(pattern, event.get("text").lower()))
 
 
