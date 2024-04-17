@@ -1,4 +1,4 @@
-from vk_api import VkApi, VkApiError
+from vk_api import VkApi
 from db import db
 from tools.keyboards import SnackbarAnswer
 from .abc import ABCHandler
@@ -45,9 +45,3 @@ class BaseFilter(ABCHandler):
     async def _has_content(event: dict, content_name: str) -> bool:
         content = event.get("attachments")
         return content_name in content
-
-    async def log(self):
-        """Sends a log of command execution
-        in log-convs.
-        """
-        # TODO: write me
