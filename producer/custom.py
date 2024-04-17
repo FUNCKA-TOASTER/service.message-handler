@@ -24,6 +24,7 @@ class CustomProducer(Producer):
             "target_id": event.get("user_id"),
             "target_name": event.get("user_name"),
             "peer_id": event.get("peer_id"),
+            "warn_count": 0,
         }
         await self._send_data(data, queue)
 
