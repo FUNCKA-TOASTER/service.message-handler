@@ -225,11 +225,13 @@ class CurseWordsFilter(BaseFilter):
             conv_id=event.get("peer_id"),
         )
 
+        if not word_list:
+            return False
+
         for word in word_list:
             pattern = rf"\b{word[0]}\b"
+            self.NAME = pattern
             return bool(re.findall(pattern, event.get("text").lower()))
-
-        return False
 
 
 # ------------------------------------------------------------------------
