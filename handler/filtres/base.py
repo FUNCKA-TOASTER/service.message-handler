@@ -27,7 +27,9 @@ class BaseFilter(ABCHandler):
         )
 
     @staticmethod
-    def _is_anabled(event: dict, setting_name: str, setting_destination: str) -> bool:
+    async def _is_anabled(
+        event: dict, setting_name: str, setting_destination: str
+    ) -> bool:
         setting = db.execute.select(
             schema="toaster_settings",
             table="settings",
@@ -40,12 +42,12 @@ class BaseFilter(ABCHandler):
         return bool(setting[0][0]) if setting else False
 
     @staticmethod
-    def _has_content(event: dict, content_name: str) -> bool:
+    async def _has_content(event: dict, content_name: str) -> bool:
         content = event.get("attachments")
         return content_name in content
 
     # TODO: перенести удаление сообщения в микросервис по выдаче наказаний
-    def _delete_own_message(self, event):
+    async def _delete_own_message(self, event):
         try:
             self.api.messages.delete(
                 delete_for_all=1, peer_id=event.get("peer_id"), cmids=event.get("cmid")

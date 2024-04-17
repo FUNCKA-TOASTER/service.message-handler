@@ -10,15 +10,15 @@ class SlowModeQueueFilter(BaseFilter):
     NAME = "Slow mode queue"
 
     async def _handle(self, event: dict, kwargs) -> bool:
-        if not self._is_anabled(event, "slow_mode", "system"):
+        if not await self._is_anabled(event, "slow_mode", "system"):
             return False
 
-        if self._user_in_queue(event):
+        if await self._user_in_queue(event):
             # TODO: Заменить на обращение к сервису наказаний.
-            self._delete_own_message(event)
+            await self._delete_own_message(event)
             return True
 
-        interval = self._get_interval(event)
+        interval = await self._get_interval(event)
         query = f"""
         INSERT INTO 
             slow_mode_queue 
@@ -42,7 +42,7 @@ class SlowModeQueueFilter(BaseFilter):
         return True
 
     @staticmethod
-    def _user_in_queue(event: dict) -> bool:
+    async def _user_in_queue(event: dict) -> bool:
         user = db.execute.select(
             schema="toaster",
             table="slow_mode_queue",
@@ -54,7 +54,7 @@ class SlowModeQueueFilter(BaseFilter):
         return bool(user)
 
     @staticmethod
-    def _get_interval(event: dict) -> int:
+    async def _get_interval(event: dict) -> int:
         interval = db.execute.select(
             schema="toaster_settings",
             table="delay",
@@ -70,19 +70,19 @@ class OpenPMFilter(BaseFilter):
     NAME = "Open private messages"
 
     async def _handle(self, event: dict, kwargs) -> bool:
-        if not self._is_anabled(event, "open_pm", "system"):
+        if not await self._is_anabled(event, "open_pm", "system"):
             return False
 
-        can_write = self._get_write_status(event)
+        can_write = await self._get_write_status(event)
 
         if can_write:
             return False
 
         # TODO: Заменить на обращение к сервису наказаний.
-        self._delete_own_message(event)
+        await self._delete_own_message(event)
         return True
 
-    def _get_write_status(self, event) -> bool:
+    async def _get_write_status(self, event) -> bool:
         info = self.api.users.get(
             user_ids=event.get("user_id"), fields=["can_write_private_message"]
         )
@@ -97,14 +97,14 @@ class AccountAgeFilter(BaseFilter):
     NAME = "Account Age"
 
     async def _handle(self, event: dict, kwargs) -> bool:
-        if not self._is_anabled(event, "account_age", "system"):
+        if not await self._is_anabled(event, "account_age", "system"):
             return False
 
         if not self._check_date(event):
             return False
 
         # TODO: Заменить на обращение к сервису наказаний.
-        self._delete_own_message(event)
+        await self._delete_own_message(event)
         return True
 
     def _check_date(self, event: dict) -> bool:
@@ -128,14 +128,15 @@ class AccountAgeFilter(BaseFilter):
         delta_seconds = (current_time - created_at).total_seconds()
 
         day_seconds = 60 * 60 * 24
+        interval = await self._get_interval(event)
 
-        if delta_seconds < self._get_interval(event) * day_seconds:
+        if delta_seconds < interval * day_seconds:
             return True
 
         return False
 
     @staticmethod
-    def _get_interval(event: dict) -> int:
+    async def _get_interval(event: dict) -> int:
         interval = db.execute.select(
             schema="toaster_settings",
             table="delay",
@@ -152,43 +153,43 @@ class URLFilter(BaseFilter):
     NAME = "URL filter"
 
     async def _handle(self, event: dict, kwargs) -> bool:
-        if not self._is_anabled(event, "url_filtering", "system"):
+        if not await self._is_anabled(event, "url_filtering", "system"):
             return False
 
         hard_mode = self._is_anabled(event, "hard_url_filtering", "system")
 
-        urls = self._get_urls(event.get("text").lower())
-        domains = self._get_domains(urls)
+        urls = await self._get_urls(event.get("text").lower())
+        domains = await self._get_domains(urls)
 
-        forbidden_domains = self._get_from_db(event, "domain", "forbidden")
-        forbodden_urls = self._get_from_db(event, "url", "forbidden")
+        forbidden_domains = await self._get_from_db(event, "domain", "forbidden")
+        forbodden_urls = await self._get_from_db(event, "url", "forbidden")
 
         if urls.intersection(forbodden_urls) or domains.intersection(forbidden_domains):
             # TODO: Заменить на обращение к сервису наказаний.
-            self._delete_own_message(event)
+            await self._delete_own_message(event)
             return True
 
         if hard_mode:
-            allowed_domains = self._get_from_db(event, "domain", "allowed")
-            allowed_urls = self._get_from_db(event, "url", "allowed")
+            allowed_domains = await self._get_from_db(event, "domain", "allowed")
+            allowed_urls = await self._get_from_db(event, "url", "allowed")
 
             if urls - allowed_urls or domains - allowed_domains:
                 # TODO: Заменить на обращение к сервису наказаний.
-                self._delete_own_message(event)
+                await self._delete_own_message(event)
                 return True
 
         return False
 
-    def _get_urls(self, text) -> set:
+    async def _get_urls(self, text) -> set:
         pattern = r"(https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)?)"
         result = re.findall(pattern, text)
         return {url[0] for url in result}
 
-    def _get_domains(self, url_list) -> set:
+    async def _get_domains(self, url_list) -> set:
         pattern = r"(?<=://)(.*?)(?=\/)"
         return {re.findall(pattern, url)[0] for url in url_list}
 
-    def _get_from_db(self, event, pattern_type, pattern_status) -> set:
+    async def _get_from_db(self, event, pattern_type, pattern_status) -> set:
         content = db.execute.select(
             schema="toaster_settings",
             table="url_filter",
@@ -205,7 +206,7 @@ class CurseWordsFilter(BaseFilter):
     NAME = "Curse words filter"
 
     async def _handle(self, event: dict, kwargs) -> bool:
-        if not self._is_anabled(event, "curse_words", "system"):
+        if not await self._is_anabled(event, "curse_words", "system"):
             return False
 
         found = await self._find_curse(event)
@@ -214,7 +215,7 @@ class CurseWordsFilter(BaseFilter):
             return False
 
         # TODO: Заменить на обращение к сервису наказаний.
-        self._delete_own_message(event)
+        await self._delete_own_message(event)
         return True
 
     async def _find_curse(self, event) -> bool:
@@ -256,7 +257,7 @@ class ContentFilter(BaseFilter):
     async def _handle(self, event: dict, kwargs) -> bool:
         for content_name in self.CONTENT:
             if not self._is_anabled(event, content_name, "filter"):
-                if self._has_content(event, content_name):
+                if await self._has_content(event, content_name):
                     self.NAME = f"Content filter <{content_name}>"
 
                     # TODO: Заменить на обращение к сервису наказаний.
