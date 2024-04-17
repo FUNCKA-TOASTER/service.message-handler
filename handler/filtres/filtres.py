@@ -14,7 +14,7 @@ class SlowModeQueueFilter(BaseFilter):
             return False
 
         if self._user_in_queue(event):
-            # TODO: Заменить на обращение к сервесу наказаний.
+            # TODO: Заменить на обращение к сервису наказаний.
             self._delete_own_message(event)
             return True
 
@@ -78,7 +78,7 @@ class OpenPMFilter(BaseFilter):
         if can_write:
             return False
 
-        # TODO: Заменить на обращение к сервесу наказаний.
+        # TODO: Заменить на обращение к сервису наказаний.
         self._delete_own_message(event)
         return True
 
@@ -103,7 +103,7 @@ class AccountAgeFilter(BaseFilter):
         if not self._check_date(event):
             return False
 
-        # TODO: Заменить на обращение к сервесу наказаний.
+        # TODO: Заменить на обращение к сервису наказаний.
         self._delete_own_message(event)
         return True
 
@@ -157,14 +157,14 @@ class URLFilter(BaseFilter):
 
         hard_mode = self._is_anabled(event, "hard_url_filtering", "system")
 
-        urls = self._get_urls(event.get("text"))
+        urls = self._get_urls(event.get("text").lower())
         domains = self._get_domains(urls)
 
         forbidden_domains = self._get_from_db(event, "domain", "forbidden")
         forbodden_urls = self._get_from_db(event, "url", "forbidden")
 
         if urls.intersection(forbodden_urls) or domains.intersection(forbidden_domains):
-            # TODO: Заменить на обращение к сервесу наказаний.
+            # TODO: Заменить на обращение к сервису наказаний.
             self._delete_own_message(event)
             return True
 
@@ -173,7 +173,7 @@ class URLFilter(BaseFilter):
             allowed_urls = self._get_from_db(event, "url", "allowed")
 
             if urls - allowed_urls or domains - allowed_domains:
-                # TODO: Заменить на обращение к сервесу наказаний.
+                # TODO: Заменить на обращение к сервису наказаний.
                 self._delete_own_message(event)
                 return True
 
@@ -213,7 +213,7 @@ class CurseWordsFilter(BaseFilter):
         if not found:
             return False
 
-        # TODO: Заменить на обращение к сервесу наказаний.
+        # TODO: Заменить на обращение к сервису наказаний.
         self._delete_own_message(event)
         return True
 
@@ -227,7 +227,7 @@ class CurseWordsFilter(BaseFilter):
 
         for word in word_list:
             pattern = rf"\b{word[0]}\b"
-            return bool(re.findall(pattern, event.get("text")))
+            return bool(re.findall(pattern, event.get("text").lower()))
 
 
 # ------------------------------------------------------------------------
@@ -255,7 +255,7 @@ class ContentFilter(BaseFilter):
                 if self._has_content(event, content_name):
                     self.NAME = f"Content filter <{content_name}>"
 
-                    # TODO: Заменить на обращение к сервесу наказаний.
+                    # TODO: Заменить на обращение к сервису наказаний.
                     self._delete_own_message(event)
                     return True
 
