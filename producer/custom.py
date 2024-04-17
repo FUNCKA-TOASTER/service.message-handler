@@ -14,14 +14,16 @@ class CustomProducer(Producer):
         "warn": "warns",
     }
 
-    async def initiate_warn(self, event, message, target, setting=None):
+    async def initiate_warn(self, event, message, setting=None):
         queue = self.event_queues["warn"]
         data = {
-            "warn_author": event.get("user_id"),
+            "author_id": 0,
+            "author_name": "TOASTER",
             "setting": setting,
-            "text": message,
-            "warn_target": target,
-            "conversation": event.get("peer_id"),
+            "reason_message": message,
+            "target_id": event.get("user_id"),
+            "target_name": event.get("user_name"),
+            "peer_id": event.get("peer_id"),
         }
         await self._send_data(data, queue)
 
