@@ -26,6 +26,7 @@ class CustomProducer(Producer):
             "peer_id": event.get("peer_id"),
             "cmid": event.get("cmid"),
             "warn_count": 0,
+            "target_message_cmid": event.get("cmid"),
         }
         await self._send_data(data, queue)
 
