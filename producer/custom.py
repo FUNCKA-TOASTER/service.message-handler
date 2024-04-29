@@ -24,6 +24,7 @@ class CustomProducer(Producer):
             "target_id": event.get("user_id"),
             "target_name": event.get("user_name"),
             "peer_id": event.get("peer_id"),
+            "peer_name": event.get("peer_name"),
             "cmid": event.get("cmid"),
             "warn_count": 0,
             "target_message_cmid": event.get("cmid"),
