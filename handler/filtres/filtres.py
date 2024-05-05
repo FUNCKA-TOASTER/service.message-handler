@@ -263,6 +263,7 @@ class ContentFilter(BaseFilter):
         "poll",
         "video",
         "wall",
+        "geo",
     )
 
     async def _handle(self, event: dict, kwargs) -> bool:
