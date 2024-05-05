@@ -179,7 +179,7 @@ class URLFilter(BaseFilter):
             allowed_domains = await self._get_from_db(event, "domain", "allowed")
             allowed_urls = await self._get_from_db(event, "url", "allowed")
 
-            if urls - allowed_urls or domains - allowed_domains:
+            if domains - allowed_domains and urls - allowed_urls:
                 await producer.initiate_warn(
                     event=event,
                     message="не присылай подозрительные ссылки!",
