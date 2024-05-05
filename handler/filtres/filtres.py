@@ -4,7 +4,6 @@ import datetime
 from db import db
 from producer import producer
 from .base import BaseFilter
-from logger import logger
 
 
 # ------------------------------------------------------------------------
@@ -160,7 +159,7 @@ class URLFilter(BaseFilter):
         if not await self._is_anabled(event, "url_filtering", "system"):
             return False
 
-        hard_mode = self._is_anabled(event, "hard_url_filtering", "system")
+        hard_mode = await self._is_anabled(event, "hard_url_filtering", "system")
 
         urls = await self._get_urls(event.get("text").lower())
         domains = await self._get_domains(urls)
@@ -175,8 +174,6 @@ class URLFilter(BaseFilter):
                 setting="url_filtering",
             )
             return True
-
-        await logger.debug(str(hard_mode))
 
         if hard_mode:
             allowed_domains = await self._get_from_db(event, "domain", "allowed")
