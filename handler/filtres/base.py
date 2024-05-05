@@ -2,6 +2,7 @@ from vk_api import VkApi
 from db import db
 from tools.keyboards import SnackbarAnswer
 from .abc import ABCHandler
+from logger import logger
 
 
 class BaseFilter(ABCHandler):
@@ -38,7 +39,10 @@ class BaseFilter(ABCHandler):
             setting_name=setting_name,
             setting_destination=setting_destination,
         )
-
+        await logger.debug(
+            setting_name + " " + setting_destination + " " + str(event.get("peer_id"))
+        )
+        await logger.debug(str(setting))
         return bool(setting[0][0]) if setting else False
 
     @staticmethod
