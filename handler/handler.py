@@ -1,70 +1,107 @@
-from logger import logger
-from db import db
-from .abc import ABCHandler
-from .filtres import filter_list
+"""Module "handler".
+
+File:
+    handler.py
+
+About:
+    File describing message handler class.
+"""
+
+import json
+from typing import Any, Optional, NoReturn
+from loguru import logger
+from vk_api import VkApi
+from toaster.broker.events import Event
+from data import TOASTER_DB, UserPermission
+from data.scripts import (
+    get_log_peers,
+    get_user_permission,
+)
+from filters import filter_list
+import config
 
 
-class MessageHandler(ABCHandler):
-    async def _handle(self, event: dict, kwargs) -> bool:
-        if await self._get_userlvl(event) > 0:
-            log_text = "Ignoring messages from staff."
-            await logger.info(log_text)
+class MessageHandler:
+    """Message handler class."""
 
-            return False
+    def __call__(self, event: Event) -> None:
+        try:
+            self._check_content(event)
+            self._check_permissions(event)
 
-        if not any(
-            (
-                event.get("text", False),
-                event.get("attachments", False),
-                event.get("reply", False),
-                event.get("forward", False),
+            if response := self._execute(event):
+                log, filter = response
+                logger.info(log)
+                self._alert_about_execution(event, filter)
+                return
+
+        except Exception as error:
+            logger.error(error)
+
+        else:
+            logger.info("Not a single filter was triggered.")
+
+    def _execute(self, event: Event) -> Optional[str]:
+        for selected in filter_list:
+            filter_obj = selected(self._get_api())
+            filter = filter_obj.NAME
+            if filter_obj(event):
+                return (f"Filter '{filter}' was triggered.", filter)
+
+    @staticmethod
+    def _check_content(event: Event) -> Optional[NoReturn]:
+        content = (
+            event.message.text,
+            event.message.attachments,
+            "reply" in event.message.attachments,
+            "forwars" in event.message.attachments,
+        )
+        if not any(content):
+            raise AttributeError("Missing message content.")
+
+    @staticmethod
+    def _check_permissions(event: Event) -> Optional[NoReturn]:
+        permission = get_user_permission(
+            db_instance=TOASTER_DB,
+            uuid=event.user.uuid,
+            bpid=event.peer.bpid,
+        )
+
+        if permission == UserPermission.user:
+            raise PermissionError("Ignoring filtering for staff messages.")
+
+    def _alert_about_execution(self, event: Event, name: str):
+        answer_text = (
+            f"[id{event.user.uuid}|{event.user.name}] не прошел проверку. \n"
+            f"Беседа: {event.peer.name} \n"
+            f"Фильтр: {name} \n"
+        )
+
+        forward = {
+            "peer_id": event.peer.bpid,
+            "conversation_message_ids": None,
+        }
+
+        if event.message.reply:
+            forward["conversation_message_ids"] = [event.message.reply.cmid]
+
+        elif event.message.forward:
+            cmids = [reply.cmid for reply in event.message.forward]
+            forward["conversation_message_ids"] = cmids
+
+        api = self._get_api()
+
+        for bpid in get_log_peers(db_instance=TOASTER_DB):
+            api.messages.send(
+                peer_ids=bpid,
+                random_id=0,
+                message=answer_text,
+                forward=json.dumps(forward),
             )
-        ):
-            log_text = f"Missing message content <{event.get('event_id')}>"
-            await logger.info(log_text)
 
-            return False
-
-        log_text = f"Event <{event.get('event_id')}> "
-
-        for filt in filter_list:
-            selected = filt(super().api)
-            result = await selected(event)
-            if result:
-                log_text += f'triggered "{selected.NAME}" filter.'
-                await logger.info(log_text)
-                return result
-
-        log_text += "did not triggered any filter."
-
-        await logger.info(log_text)
-        return False
-
-    async def _get_userlvl(self, event: dict) -> int:
-        tech_admin = db.execute.select(
-            schema="toaster_settings",
-            table="staff",
-            fields=("user_id",),
-            user_id=event.get("user_id"),
-            staff_role="TECH",
+    def _get_api(self) -> Any:
+        session = VkApi(
+            token=config.TOKEN,
+            api_version=config.API_VERSION,
         )
-
-        if bool(tech_admin):
-            if event.get("user_id") == tech_admin[0][0]:
-                return 2
-
-        user_lvl = db.execute.select(
-            schema="toaster",
-            table="permissions",
-            fields=("user_permission",),
-            conv_id=event.get("peer_id"),
-            user_id=event.get("user_id"),
-        )
-
-        if bool(user_lvl):
-            return int(user_lvl[0][0])
-
-        return 0
-
-
-message_handler = MessageHandler()
+        return session.get_api()
