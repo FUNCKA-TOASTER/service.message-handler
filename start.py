@@ -1,29 +1,48 @@
-"""Service "toaster.comman-handling-service".
-About:
-    ...
+"""Service "service.message-handler".
 
-Author:
-    Oidaho (Ruslan Bashinskii)
-    oidahomain@gmail.com
+File:
+    start.py
+
+About:
+    This service is responsible for receiving custom
+    events from the Redis channel "message", processing
+    these events, and executing actions of filtering and
+    content validation systems.
 """
 
-import asyncio
-from consumer import consumer
-from handler import message_handler
-from logger import logger
+import sys
+from loguru import logger
+from toaster.broker import Subscriber, build_connection
+from data import TOASTER_DB
+from handler import CommandHandler
+import config
+
+
+def setup_logger() -> None:
+    logger.remove()
+    logger.add(
+        sys.stdout,
+        colorize=True,
+        format="<green>{time:YYYY-MM-DD HH:mm:ss}</green> | <red>{module}</red> | <level>{level}</level> | {message}",
+        level="DEBUG",
+    )
+
+
+def setup_db() -> None:
+    TOASTER_DB.create_tables()
 
 
 async def main():
-    """Entry point."""
-    log_text = "Awaiting button events..."
-    await logger.info(log_text)
+    """Program entry point."""
 
-    for data in consumer.listen_queue("messages"):
-        log_text = f"Recived new event: {data}"
-        await logger.info(log_text)
+    setup_logger()
+    setup_db()
+    subscriber = Subscriber(client=build_connection(config.REDIS_CREDS))
+    handler = CommandHandler()
 
-        await message_handler(data)
+    for event in subscriber.listen(channel_name=config.CHANNEL_NAME):
+        handler(event)
 
 
 if __name__ == "__main__":
-    asyncio.run(main())
+    main()
