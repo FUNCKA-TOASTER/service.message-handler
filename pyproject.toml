@@ -1,0 +1,30 @@
+[tool.poetry]
+package-mode = false
+name = "service.message-handler"
+version = "0.2.0"
+description = "TOASTER bot. Service for handling message events."
+repository = "https://github.com/FUNCKA-TOASTER/service.message-handler"
+documentation = "https://github.com/FUNCKA-TOASTER/TOASTER/wiki"
+authors = [
+    "Oidaho <oidahomain@gmail.com>"
+]
+license = "GPL-3.0-only"
+readme = "README.md"
+packages = []
+
+
+[tool.poetry.dependencies]
+python = "^3.10"
+dill = "^0.3.8"
+vk-api = "^11.9.9"
+redis = "^5.0.7"
+colorama = "^0.4.6"
+sqlalchemy = "^2.0.31"
+pymysql = "^1.1.1"
+cryptography = "^42.0.8"
+loguru = "^0.7.2"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
