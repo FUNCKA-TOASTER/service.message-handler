@@ -14,7 +14,7 @@ import sys
 from loguru import logger
 from toaster.broker import Subscriber, build_connection
 from data import TOASTER_DB
-from handler import CommandHandler
+from handler import MessageHandler
 import config
 
 
@@ -38,7 +38,7 @@ async def main():
     setup_logger()
     setup_db()
     subscriber = Subscriber(client=build_connection(config.REDIS_CREDS))
-    handler = CommandHandler()
+    handler = MessageHandler()
 
     for event in subscriber.listen(channel_name=config.CHANNEL_NAME):
         handler(event)
