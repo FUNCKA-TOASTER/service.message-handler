@@ -9,7 +9,7 @@ from .base import BaseFilter
 
 # ------------------------------------------------------------------------
 class SlowModeQueue(BaseFilter):
-    NAME = "SlowModeQueue"
+    NAME = "Slow Mode"
 
     def _handle(self, event: Event) -> bool:
         setting = "slow_mode"
