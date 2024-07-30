@@ -31,9 +31,9 @@ def get_destinated_settings_status(
 
 
 @script(auto_commit=False, debug=True)
-def get_setting_status(session: Session, bpid: int, name: str) -> bool:
+def get_setting_status(session: Session, bpid: int, name: str) -> SettingStatus:
     setting = session.get(Setting, {"bpid": bpid, "name": name})
-    return setting.status if setting else False
+    return setting.status if setting else SettingStatus.inactive
 
 
 @script(auto_commit=False, debug=True)
