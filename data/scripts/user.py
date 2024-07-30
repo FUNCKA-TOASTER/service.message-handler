@@ -83,10 +83,8 @@ def get_user_queue_status(session: Session, uuid: int, bpid: int) -> Optional[da
 @script(auto_commit=False, debug=True)
 def insert_user_to_queue(session: Session, uuid: int, bpid: int, setting: str) -> None:
     setting = session.get(Delay, {"bpid": bpid, "setting": setting})
-    new_queue_row = Queue(
-        bpid=bpid,
-        uuid=uuid,
-        expired=(datetime.now() + timedelta(minutes=setting.delay)),
-    )
-    session.add(new_queue_row)
+    delay = setting.delay if setting else 0
+    expired = datetime.now() + timedelta(minutes=delay)
+    new_row = Queue(bpid=bpid, uuid=uuid, expired=expired)
+    session.add(new_row)
     session.commit()
