@@ -17,7 +17,7 @@ class SlowModeQueue(BaseFilter):
             return False
 
         expired = get_user_queue_status(
-            db_isntance=TOASTER_DB,
+            db_instance=TOASTER_DB,
             uuid=event.user.uuid,
             bpid=event.peer.bpid,
         )
