@@ -29,7 +29,7 @@ WORKDIR /service
 RUN pip install poetry
 
 # Copy only the dependency information
-COPY pyproject.toml poetry.lock ./
+COPY pyproject.toml ./
 
 # Install dependencies using poetry
 RUN poetry config virtualenvs.create false
