@@ -67,7 +67,7 @@ class MessageHandler:
             bpid=event.peer.bpid,
         )
 
-        if permission == UserPermission.user:
+        if permission != UserPermission.user:
             raise PermissionError("Ignoring filtering for staff messages.")
 
     def _alert_about_execution(self, event: Event, name: str):
