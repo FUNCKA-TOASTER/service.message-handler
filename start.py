@@ -32,7 +32,7 @@ def setup_db() -> None:
     TOASTER_DB.create_tables()
 
 
-async def main():
+def main():
     """Program entry point."""
 
     setup_logger()
