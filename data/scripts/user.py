@@ -77,3 +77,10 @@ def get_user_warns(session: Session, uuid: int, bpid: int) -> Optional[WarnInfo]
 def get_user_queue_status(session: Session, uuid: int, bpid: int) -> Optional[datetime]:
     queue = session.get(Queue, {"bpid": bpid, "uuid": uuid})
     return queue.expired if queue else None
+
+
+@script(auto_commit=False, debug=True)
+def insert_user_to_queue(session: Session, uuid: int, bpid: int) -> None:
+    row = Queue(bpid=bpid, uuid=uuid, expired=datetime.now())
+    session.add(row)
+    session.commit()

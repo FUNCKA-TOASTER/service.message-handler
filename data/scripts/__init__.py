@@ -21,9 +21,11 @@ from .user import (
     drop_user_permission,
     get_user_warns,
     get_user_queue_status,
+    insert_user_to_queue,
 )
 from .setting import (
     get_destinated_settings_status,
+    get_setting_status,
     update_setting_status,
     get_setting_points,
     update_setting_points,
@@ -49,6 +51,7 @@ __all__ = (
     "update_user_permission",
     "drop_user_permission",
     "get_destinated_settings_status",
+    "get_setting_status",
     "update_setting_status",
     "get_setting_points",
     "update_setting_points",
@@ -56,6 +59,7 @@ __all__ = (
     "update_setting_delay",
     "get_user_warns",
     "get_user_queue_status",
+    "insert_user_to_queue",
     "insert_pattern",
     "insert_cursed",
     "get_log_peers",

@@ -31,6 +31,12 @@ def get_destinated_settings_status(
 
 
 @script(auto_commit=False, debug=True)
+def get_setting_status(session: Session, bpid: int, name: str) -> bool:
+    setting = session.get(Setting, {"bpid": bpid, "name": name})
+    return setting.status if setting else False
+
+
+@script(auto_commit=False, debug=True)
 def get_setting_points(session: Session, bpid: int, name: str) -> Optional[int]:
     setting = session.get(Setting, {"bpid": bpid, "name": name})
     return setting.points if setting else None
