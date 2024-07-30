@@ -111,7 +111,7 @@ class Queue(BaseModel):
 
     bpid: Mapped[BPID]
     uuid: Mapped[UUID]
-    expired: Mapped[int] = mapped_column(DATETIME)
+    expired: Mapped[datetime] = mapped_column(DATETIME)
 
 
 # Таблицы настроект узлов
