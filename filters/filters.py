@@ -12,7 +12,8 @@ class SlowModeQueue(BaseFilter):
     NAME = "SlowModeQueue"
 
     def _handle(self, event: Event) -> bool:
-        check = self._is_setting_enabled(event, "slow_mode")
+        setting = "slow_mode"
+        check = self._is_setting_enabled(event, setting)
         if not check:
             return False
 
@@ -38,6 +39,7 @@ class SlowModeQueue(BaseFilter):
             db_instance=TOASTER_DB,
             uuid=event.user.uuid,
             bpid=event.peer.bpid,
+            setting=setting,
         )
 
         return True

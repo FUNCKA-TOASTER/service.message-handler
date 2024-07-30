@@ -9,7 +9,7 @@ About:
 """
 
 from typing import Tuple, Optional
-from datetime import datetime
+from datetime import datetime, timedelta
 from sqlalchemy.orm import Session
 from toaster.database import script
 from data import (
@@ -19,6 +19,7 @@ from data import (
     UserPermission,
     Warn,
     Queue,
+    Delay,
 )
 
 
@@ -80,7 +81,12 @@ def get_user_queue_status(session: Session, uuid: int, bpid: int) -> Optional[da
 
 
 @script(auto_commit=False, debug=True)
-def insert_user_to_queue(session: Session, uuid: int, bpid: int) -> None:
-    row = Queue(bpid=bpid, uuid=uuid, expired=datetime.now())
-    session.add(row)
+def insert_user_to_queue(session: Session, uuid: int, bpid: int, setting: str) -> None:
+    setting = session.get(Delay, {"bpid": bpid, "setting": setting})
+    new_queue_row = Queue(
+        bpid=bpid,
+        uuid=uuid,
+        expired=(datetime.now() + timedelta(minutes=setting.delay)),
+    )
+    session.add(new_queue_row)
     session.commit()
