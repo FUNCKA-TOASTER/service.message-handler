@@ -1,4 +1,5 @@
 from data import TOASTER_DB
+from data import SettingStatus
 from data.scripts import (
     get_user_queue_status,
     insert_user_to_queue,
@@ -13,8 +14,8 @@ class SlowModeQueue(BaseFilter):
 
     def _handle(self, event: Event) -> bool:
         setting = "slow_mode"
-        check = self._is_setting_enabled(event, setting)
-        if not check:
+        status = self._is_setting_enabled(event, setting)
+        if status == SettingStatus.inactive:
             return False
 
         expired = get_user_queue_status(
