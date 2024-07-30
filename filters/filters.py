@@ -42,4 +42,4 @@ class SlowModeQueue(BaseFilter):
             setting=setting,
         )
 
-        return True
+        return False
