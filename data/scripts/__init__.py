@@ -40,7 +40,7 @@ from .session import (
     get_expired_sessions,
 )
 from .url import insert_pattern, get_patterns
-from .cursed import insert_cursed
+from .cursed import insert_cursed, get_curse_words
 
 __all__ = (
     "get_peer_mark",
@@ -64,6 +64,7 @@ __all__ = (
     "insert_pattern",
     "get_patterns",
     "insert_cursed",
+    "get_curse_words",
     "get_log_peers",
     "open_menu_session",
     "close_menu_session",
