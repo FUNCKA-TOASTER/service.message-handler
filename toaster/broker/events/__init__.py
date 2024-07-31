@@ -7,7 +7,7 @@ About:
     Initializing the "events" module.
 """
 
-from .events import Event
+from .events import Event, Punishment
 from .objects import (
     Message,
     Reply,
@@ -19,6 +19,7 @@ from .objects import (
 
 __all__ = (
     "Event",
+    "Punishment",
     "Message",
     "Reply",
     "Reaction",
