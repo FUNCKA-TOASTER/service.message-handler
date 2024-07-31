@@ -38,7 +38,7 @@ from .session import (
     open_menu_session,
     close_menu_session,
 )
-from .url import insert_pattern
+from .url import insert_pattern, get_patterns
 from .cursed import insert_cursed
 
 __all__ = (
@@ -61,6 +61,7 @@ __all__ = (
     "get_user_queue_status",
     "insert_user_to_queue",
     "insert_pattern",
+    "get_patterns",
     "insert_cursed",
     "get_log_peers",
     "open_menu_session",
