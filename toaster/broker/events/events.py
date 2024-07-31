@@ -89,7 +89,8 @@ class Event(BaseEvent):
         return string
 
     def add_object(self, name: str, value: Any) -> None:
-        """Добавляет обьект данных события в качестве атрибута класса.
+        """Adds the event data object as an attribute
+        of the class.
 
         Args:
             name (str): Object name.
@@ -119,6 +120,15 @@ class Punishment(BaseEvent):
         return string
 
     def set_cmids(self, cmids: Union[int, List[int]]) -> None:
+        """Sets the list of messages to delete when punished.
+
+        Args:
+            cmids (Union[int, List[int]]): Coversation message ids
+
+        Raises:
+            TypeError: Called when the type of the passed argument
+            does not match.
+        """
         if isinstance(cmids, list):
             self.cmids = [cmid for cmid in cmids]
         elif isinstance(cmids, int):
@@ -127,10 +137,30 @@ class Punishment(BaseEvent):
             raise TypeError("cmids argument must be 'int' or 'list of int'")
 
     def set_target(self, bpid: int, uuid: int) -> None:
+        """Sets the user and conversation in which to issue
+        the punishment.
+
+        Args:
+            bpid (int): Bot peer id
+            uuid (int): Unique user id
+        """
         self.bpid = bpid
         self.uuid = uuid
 
     def set_points(self, points: int) -> None:
+        """Sets the number of warn points if the
+        punisment type is a 'warn'.
+
+        Args:
+            points (int): Number of warn points.
+
+        Raises:
+            TypeError: Called when there is an attempt
+            to set penalty points of any type other than
+            'warn'. Or when points are not of type 'int'.
+        """
+        if isinstance(points, int):
+            TypeError("Type of 'points' argument must be 'int'.")
         if self.punishment_type == "warn":
             self.points = points
         else:
