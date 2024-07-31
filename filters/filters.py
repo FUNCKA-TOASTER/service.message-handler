@@ -1,6 +1,6 @@
 import re
 import requests
-from typing import Optional, NoReturn, Union
+from typing import Optional, NoReturn, Union, Set
 from datetime import datetime, timedelta
 import xml.etree.ElementTree as ET
 from vk_api import VkApiError
@@ -34,17 +34,13 @@ class SlowModeQueue(BaseFilter):
         )
 
         if expired is not None:
-            # comment = "Помедленнее! Соблюдай интервал сообщений."
-            # points = get_setting_points()
-            # TODO: Запустить действие в сервисе наказаний.
-            # На сервис наказаний отправить:
-            #   - type: "warn"                       (Название действия)
-            #   - uuid: target_id                    (ID нарушителя)
-            #   - points: points                     (Кол-во варнов)
-            #   - bpid: event.peer.bpid              (Где произошло)
-            #   - cmids: [event.message.reply.cmid]  (Если есть - удалить это сообщение)
-            #   - comment: "Some text"               (Комментарий при удалении)
-
+            comment = "Помедленнее! Соблюдай интервал сообщений."
+            self._publish_punishment(
+                type="warn",
+                comment=comment,
+                setting=setting,
+                event=event,
+            )
             return True
 
         insert_user_to_queue(
@@ -69,17 +65,13 @@ class OpenPrivateMessages(BaseFilter):
         is_opened = self._get_pm_status(event)
 
         if not is_opened:
-            # comment = "Помедленнее! Соблюдай интервал сообщений."
-            # points = get_setting_points()
-            # TODO: Запустить действие в сервисе наказаний.
-            # На сервис наказаний отправить:
-            #   - type: "warn"                       (Название действия)
-            #   - uuid: target_id                    (ID нарушителя)
-            #   - points: points                     (Кол-во варнов)
-            #   - bpid: event.peer.bpid              (Где произошло)
-            #   - cmids: [event.message.reply.cmid]  (Если есть - удалить это сообщение)
-            #   - comment: "Some text"               (Комментарий при удалении)
-
+            comment = "Необходимо открыть личные сообщения."
+            self._publish_punishment(
+                type="warn",
+                comment=comment,
+                setting=setting,
+                event=event,
+            )
             return True
 
         return False
@@ -119,17 +111,13 @@ class AccountAge(BaseFilter):
                 current_date = datetime.now()
 
                 if (current_date - created_date) < delta:
-                    # comment = "Помедленнее! Соблюдай интервал сообщений."
-                    # points = get_setting_points()
-                    # TODO: Запустить действие в сервисе наказаний.
-                    # На сервис наказаний отправить:
-                    #   - type: "warn"                       (Название действия)
-                    #   - uuid: target_id                    (ID нарушителя)
-                    #   - points: points                     (Кол-во варнов)
-                    #   - bpid: event.peer.bpid              (Где произошло)
-                    #   - cmids: [event.message.reply.cmid]  (Если есть - удалить это сообщение)
-                    #   - comment: "Some text"               (Комментарий при удалении)
-
+                    comment = "Ваш аккаунт слишком молод."
+                    self._publish_punishment(
+                        type="warn",
+                        comment=comment,
+                        setting=setting,
+                        event=event,
+                    )
                     return True
 
         return False
@@ -175,30 +163,8 @@ class LinksAndDomains(BaseFilter):
         text = event.message.text.lower()
         text_links = self._get_links(text=text)
 
-        forbidden_links = get_patterns(
-            db_instance=TOASTER_DB,
-            bpid=event.peer.bpid,
-            type=UrlType.url,
-            status=UrlStatus.forbidden,
-        )
-        forbidden_domains = get_patterns(
-            db_instance=TOASTER_DB,
-            bpid=event.peer.bpid,
-            type=UrlType.domain,
-            status=UrlStatus.forbidden,
-        )
-
-        allowed_links = get_patterns(
-            db_instance=TOASTER_DB,
-            bpid=event.peer.bpid,
-            type=UrlType.url,
-            status=UrlStatus.allowed,
-        )
-        allowed_domains = get_patterns(
-            db_instance=TOASTER_DB,
-            bpid=event.peer.bpid,
-            type=UrlType.domain,
-            status=UrlStatus.allowed,
+        forbidden_links, forbidden_domains, allowed_links, allowed_domains = (
+            self._get_patterns(event=event, setting=setting)
         )
 
         hard_mode = self._is_setting_enabled(event, "hard_url_filtering")
@@ -207,22 +173,22 @@ class LinksAndDomains(BaseFilter):
             if {domain} & forbidden_domains:
                 if {link} & allowed_links:
                     if hard_mode:
-                        self._initiate_punish(event, "hard_url_filtering")
+                        self._init_publish(event=event, setting="hard_url_filtering")
                         self.NAME = self.NAME + " <grey link>"
                         return True
 
                 else:
-                    self._initiate_punish(event, setting)
+                    self._init_publish(event=event, setting=setting)
                     self.NAME = self.NAME + " <forbidden domain>"
                     return True
 
             if {link} & forbidden_links:
-                self._initiate_punish(event, setting)
+                self._init_publish(event=event, setting=setting)
                 self.NAME = self.NAME + " <forbidden link>"
                 return True
 
             if not {domain} & allowed_domains and hard_mode:
-                self._initiate_punish(event, "hard_url_filtering")
+                self._init_publish(event=event, setting="hard_url_filtering")
                 self.NAME = self.NAME + " <grey domain>"
                 return True
 
@@ -240,18 +206,35 @@ class LinksAndDomains(BaseFilter):
         domain = re.findall(pattern, link)
         return domain[0] if domain else None
 
-    def _initiate_punish(self, event: Event, setting: str) -> None:
-        pass
-        # comment = "Эту ссылку\домен запрещено распространять."
-        # points = get_setting_points()
-        # TODO: Запустить действие в сервисе наказаний.
-        # На сервис наказаний отправить:
-        #   - type: "warn"                       (Название действия)
-        #   - uuid: target_id                    (ID нарушителя)
-        #   - points: points                     (Кол-во варнов)
-        #   - bpid: event.peer.bpid              (Где произошло)
-        #   - cmids: [event.message.reply.cmid]  (Если есть - удалить это сообщение)
-        #   - comment: "Some text"               (Комментарий при удалении)
+    def _init_publish(self, event: Event, setting: str):
+        comment = "Эту ссылку\домен запрещено распространять."
+        self._publish_punishment(
+            type="warn",
+            comment=comment,
+            setting=setting,
+            event=event,
+        )
+
+    def _get_patterns(self, event: Event) -> Set[str]:
+        properties = [
+            (UrlType.url, UrlStatus.forbidden),
+            (UrlType.domain, UrlStatus.forbidden),
+            (UrlType.url, UrlStatus.allowed),
+            (UrlType.domain, UrlStatus.allowed),
+        ]
+
+        result = []
+        for type, status in properties:
+            result.append(
+                get_patterns(
+                    db_instance=TOASTER_DB,
+                    bpid=event.peer.bpid,
+                    type=type,
+                    status=status,
+                )
+            )
+
+        return result
 
 
 class CurseWords(BaseFilter):
@@ -271,17 +254,13 @@ class CurseWords(BaseFilter):
         for word in word_list:
             text = event.message.text.lower()
             if re.search(r"\b" + re.escape(word) + r"\b", text):
-                # comment = "Это слово запрещено."
-                # points = get_setting_points()
-                # TODO: Запустить действие в сервисе наказаний.
-                # На сервис наказаний отправить:
-                #   - type: "warn"                       (Название действия)
-                #   - uuid: target_id                    (ID нарушителя)
-                #   - points: points                     (Кол-во варнов)
-                #   - bpid: event.peer.bpid              (Где произошло)
-                #   - cmids: [event.message.reply.cmid]  (Если есть - удалить это сообщение)
-                #   - comment: "Some text"               (Комментарий при удалении)
-
+                comment = "Это слово запрещено."
+                self._publish_punishment(
+                    type="warn",
+                    comment=comment,
+                    setting=setting,
+                    event=event,
+                )
                 return True
 
         return False
@@ -312,17 +291,13 @@ class Content(BaseFilter):
                 if self._has_content(event, setting):
                     self.NAME = self.NAME + f" <{setting}>"
 
-                    # comment = "Этот контент запрещен."
-                    # points = get_setting_points()
-                    # TODO: Запустить действие в сервисе наказаний.
-                    # На сервис наказаний отправить:
-                    #   - type: "warn"                       (Название действия)
-                    #   - uuid: target_id                    (ID нарушителя)
-                    #   - points: points                     (Кол-во варнов)
-                    #   - bpid: event.peer.bpid              (Где произошло)
-                    #   - cmids: [event.message.reply.cmid]  (Если есть - удалить это сообщение)
-                    #   - comment: "Some text"               (Комментарий при удалении)
-
+                    comment = "Этот контент запрещен."
+                    self._publish_punishment(
+                        type="warn",
+                        comment=comment,
+                        setting=setting,
+                        event=event,
+                    )
                     return True
 
         return False

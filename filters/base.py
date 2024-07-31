@@ -10,14 +10,17 @@ About:
 from abc import ABC, abstractmethod
 from vk_api import VkApi
 from data import TOASTER_DB
-from data.scripts import get_setting_status
-from toaster.broker.events import Event
+from data.scripts import get_setting_status, get_setting_points
+from toaster.broker.events import Event, Punishment
+from toaster.broker import Publisher, build_connection
+import config
 
 
 class BaseFilter(ABC):
     """Base class of the bot filter."""
 
     NAME = "None"
+    publisher = Publisher(build_connection(config.REDIS_CREDS))
 
     def __init__(self, api: VkApi) -> None:
         self.api = api
@@ -49,3 +52,22 @@ class BaseFilter(ABC):
     def _has_content(event: Event, content_name: str) -> bool:
         attachments = event.message.attachments
         return content_name in attachments
+
+    def _publish_punishment(
+        self, type: str, comment: str, setting: str, event: Event
+    ) -> None:
+        coeff = 1
+        if type == "unwarn":
+            type = "warn"
+            coeff = -1
+        punishment = Punishment(type=type, comment=comment)
+        punishment.set_cmids(cmids=event.message.cmid)
+        punishment.set_target(bpid=event.peer.bpid, uuid=event.user.uuid)
+        if type == "warn":
+            points = get_setting_points(
+                db_instance=TOASTER_DB,
+                bpid=event.peer.bpid,
+                name=setting,
+            )
+            punishment.set_points(points=points * coeff)
+        self.publisher.publish(punishment, "punishment")
