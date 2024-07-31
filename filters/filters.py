@@ -208,18 +208,22 @@ class LinksAndDomains(BaseFilter):
                 if {link} & allowed_links:
                     if hard_mode:
                         self._initiate_punish(event, "hard_url_filtering")
+                        self.NAME = self.NAME + " <grey link>"
                         return True
 
                 else:
                     self._initiate_punish(event, setting)
+                    self.NAME = self.NAME + " <forbidden domain>"
                     return True
 
             if {link} & forbidden_links:
                 self._initiate_punish(event, setting)
+                self.NAME = self.NAME + " <forbidden link>"
                 return True
 
             if not {domain} & allowed_domains and hard_mode:
                 self._initiate_punish(event, "hard_url_filtering")
+                self.NAME = self.NAME + " <grey domain>"
                 return True
 
         return False
