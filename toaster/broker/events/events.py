@@ -168,4 +168,21 @@ class Punishment(BaseEvent):
         if self.punishment_type == "warn":
             self.points = points
         else:
-            raise TypeError("Cannot set points to a punishment not a warn type.")
+            raise TypeError("Cannot set points to a punishment not a 'warn' type.")
+
+    def set_mode(self, mode: str) -> None:
+        """Sets the kick mode.
+
+        Args:
+            mode (str): Kick mode
+
+        Raises:
+            TypeError: Called when there is an attempt
+            to set mode of any type other than 'kick'.
+        """
+        if isinstance(mode, str):
+            TypeError("Type of 'mode' argument must be 'str'.")
+        if self.punishment_type == "kick":
+            self.mode = mode
+        else:
+            raise TypeError("Cannot set mode to a punishment not a 'kick' type.")
