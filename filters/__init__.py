@@ -9,15 +9,20 @@ About:
 
 from .filters import (
     SlowModeQueue,
+    OpenPrivateMessages,
+    AccountAge,
+    CurseWords,
+    Content,
+    LinksAndDomains,
 )
 
-# Filter in order of priority of execution
+# Filters in order of priority of execution
 filter_list = [
-    # AccountAge,
-    # OpenPM,
-    # Content,
-    # URL,
-    # CurseWords,
+    AccountAge,
+    OpenPrivateMessages,
+    Content,
+    LinksAndDomains,
+    CurseWords,
     SlowModeQueue,
 ]
 

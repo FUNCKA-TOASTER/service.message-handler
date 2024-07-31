@@ -47,5 +47,5 @@ class BaseFilter(ABC):
 
     @staticmethod
     def _has_content(event: Event, content_name: str) -> bool:
-        content = event.message.attachments
-        return content_name in content
+        attachments = event.message.attachments
+        return content_name in attachments
