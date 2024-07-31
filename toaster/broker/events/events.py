@@ -101,7 +101,11 @@ class Event(BaseEvent):
 
 
 class Punishment(BaseEvent):
-    """DOCSTRING"""
+    """Class for representing an punishment.
+
+    Attributes:
+        punishment_type (str): Type of the punishment.
+    """
 
     punishment_type: str = None
 
