@@ -44,8 +44,8 @@ class MessageHandler:
     def _execute(self, event: Event) -> Optional[str]:
         for selected in filter_list:
             filter_obj = selected(self._get_api())
-            filter = filter_obj.NAME
             if filter_obj(event):
+                filter = filter_obj.NAME
                 return (f"Filter '{filter}' was triggered.", filter)
 
     @staticmethod
