@@ -122,6 +122,7 @@ class AccountAge(BaseFilter):
 
         return False
 
+    @staticmethod
     def fetch_and_parse_xml(url: str) -> Optional[str]:
         try:
             response = requests.get(url, timeout=50)
@@ -131,6 +132,7 @@ class AccountAge(BaseFilter):
         except requests.RequestException as e:
             raise RuntimeError(f"Error fetching XML: {e}")
 
+    @staticmethod
     def extract_created_date(str_xml_data: str) -> Optional[Union[datetime, NoReturn]]:
         try:
             root = ET.fromstring(str_xml_data)
