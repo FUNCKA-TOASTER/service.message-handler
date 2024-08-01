@@ -145,7 +145,8 @@ class AccountAge(BaseFilter):
             target_arg = f"{{{namespaces['dc']}}}date"
             if created_element is not None and target_arg in created_element.attrib:
                 created_date_str = created_element.attrib[target_arg]
-                return datetime.fromisoformat(created_date_str)
+                created_date = datetime.fromisoformat(created_date_str)
+                return created_date.replace(tzinfo=None)
 
             else:
                 raise RuntimeError("Created date not found in the XML.")
