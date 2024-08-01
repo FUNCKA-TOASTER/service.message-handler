@@ -15,6 +15,7 @@ from data.scripts import (
 )
 from toaster.broker.events import Event
 from .base import BaseFilter
+from loguru import logger
 
 
 # ------------------------------------------------------------------------
@@ -127,6 +128,7 @@ class AccountAge(BaseFilter):
         try:
             response = requests.get(url, timeout=50)
             response.raise_for_status()
+            logger.debug(response.text)
             return response.text
 
         except requests.RequestException as e:
@@ -142,6 +144,8 @@ class AccountAge(BaseFilter):
             }
 
             created_element = root.find(".//ya:created", namespaces)
+            logger.debug(created_element)
+            logger.debug(created_element.attrib)
             if created_element is not None and "dc:date" in created_element.attrib:
                 created_date_str = created_element.attrib["dc:date"]
                 return datetime.fromisoformat(created_date_str)
