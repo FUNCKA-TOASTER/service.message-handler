@@ -1,19 +1,28 @@
 import re
 import requests
-from typing import Optional, NoReturn, Union, Set
+from typing import (
+    Optional,
+    NoReturn,
+    Union,
+    Set,
+)
 from datetime import datetime, timedelta
 import xml.etree.ElementTree as ET
 from vk_api import VkApiError
-from data import TOASTER_DB
-from data import SettingStatus, UrlStatus, UrlType
-from data.scripts import (
+from db import TOASTER_DB
+from toaster.broker.events import Event
+from toaster_utils.enums import (
+    SettingStatus,
+    LinkStatus,
+    LinkType,
+)
+from toaster_utils.scripts import (
     get_user_queue_status,
     insert_user_to_queue,
     get_setting_delay,
     get_curse_words,
     get_patterns,
 )
-from toaster.broker.events import Event
 from .base import BaseFilter
 
 
@@ -161,7 +170,7 @@ class LinksAndDomains(BaseFilter):
     NAME = "Links & Domains"
 
     def _handle(self, event: Event) -> bool:
-        setting = "url_filtering"
+        setting = "link_filter"
         status = self._is_setting_enabled(event, setting)
         if status == SettingStatus.inactive:
             return False
@@ -173,13 +182,13 @@ class LinksAndDomains(BaseFilter):
             self._get_patterns(event=event)
         )
 
-        hard_mode = self._is_setting_enabled(event, "hard_url_filtering")
+        hard_mode = self._is_setting_enabled(event, "hard_link_filter")
         for link in text_links:
             domain = self._get_domain(link)
             if {domain} & forbidden_domains:
                 if {link} & allowed_links:
                     if hard_mode:
-                        self._init_publish(event=event, setting="hard_url_filtering")
+                        self._init_publish(event=event, setting="hard_link_filter")
                         self.NAME = self.NAME + " <grey link>"
                         return True
 
@@ -194,7 +203,7 @@ class LinksAndDomains(BaseFilter):
                 return True
 
             if not {domain} & allowed_domains and hard_mode:
-                self._init_publish(event=event, setting="hard_url_filtering")
+                self._init_publish(event=event, setting="hard_link_filter")
                 self.NAME = self.NAME + " <grey domain>"
                 return True
 
@@ -223,10 +232,10 @@ class LinksAndDomains(BaseFilter):
 
     def _get_patterns(self, event: Event) -> Set[str]:
         properties = [
-            (UrlType.url, UrlStatus.forbidden),
-            (UrlType.domain, UrlStatus.forbidden),
-            (UrlType.url, UrlStatus.allowed),
-            (UrlType.domain, UrlStatus.allowed),
+            (LinkType.url, LinkStatus.forbidden),
+            (LinkType.domain, LinkStatus.forbidden),
+            (LinkType.url, LinkStatus.allowed),
+            (LinkType.domain, LinkStatus.allowed),
         ]
 
         result = []

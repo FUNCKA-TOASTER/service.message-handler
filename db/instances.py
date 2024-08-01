@@ -1,4 +1,4 @@
-"""Module "data".
+"""Module "db".
 
 File:
     instance.py

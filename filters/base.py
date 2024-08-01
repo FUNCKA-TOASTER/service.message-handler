@@ -9,10 +9,19 @@ About:
 
 from abc import ABC, abstractmethod
 from vk_api import VkApi
-from data import TOASTER_DB
-from data.scripts import get_setting_status, get_setting_points
-from toaster.broker.events import Event, Punishment
-from toaster.broker import Publisher, build_connection
+from db import TOASTER_DB
+from toaster_utils.scripts import (
+    get_setting_status,
+    get_setting_points,
+)
+from toaster.broker.events import (
+    Event,
+    Punishment,
+)
+from toaster.broker import (
+    Publisher,
+    build_connection,
+)
 import config
 
 

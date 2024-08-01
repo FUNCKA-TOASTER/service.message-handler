@@ -8,12 +8,17 @@ About:
 """
 
 import json
-from typing import Any, Optional, NoReturn
+from typing import (
+    Any,
+    Optional,
+    NoReturn,
+)
 from loguru import logger
 from vk_api import VkApi
 from toaster.broker.events import Event
-from data import TOASTER_DB, UserPermission
-from data.scripts import (
+from db import TOASTER_DB
+from toaster_utils.enums import UserPermission
+from toaster_utils.scripts import (
     get_log_peers,
     get_user_permission,
 )
