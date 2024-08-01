@@ -144,7 +144,7 @@ class AccountAge(BaseFilter):
             created_element = root.find(".//ya:created", namespaces)
             target_arg = f"{{{namespaces['dc']}}}date"
             if created_element is not None and target_arg in created_element.attrib:
-                created_date_str = created_element.attrib["dc:date"]
+                created_date_str = created_element.attrib[target_arg]
                 return datetime.fromisoformat(created_date_str)
 
             else:
