@@ -293,7 +293,7 @@ class Content(BaseFilter):
 
     def _handle(self, event: Event) -> bool:
         for setting in self.CONTENT:
-            if not self._is_setting_enabled(event, setting):
+            if self._is_setting_enabled(event, setting):
                 if self._has_content(event, setting):
                     self.NAME = self.NAME + f" <{setting}>"
 
