@@ -78,10 +78,12 @@ class OpenPrivateMessages(BaseFilter):
 
     def _get_pm_status(self, event: Event) -> Union[bool, NoReturn]:
         try:
-            self.api.users.get(
+            status = self.api.users.get(
                 user_ids=event.user.uuid,
                 fields=["can_write_private_message"],
             )[0].get("can_write_private_message")
+
+            return status
 
         except VkApiError as e:
             raise RuntimeError(f"Error getting PM status: {e}")
