@@ -118,7 +118,7 @@ class Punishment(BaseEvent):
             "<-- "
             f"class Punishment <type: {self.punishment_type}>"
             " | "
-            f"<comment: {self.event_id}>"
+            f"<comment: {self.comment}>"
             " -->"
         )
         return string
