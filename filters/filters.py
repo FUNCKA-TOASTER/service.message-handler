@@ -170,7 +170,7 @@ class LinksAndDomains(BaseFilter):
         text_links = self._get_links(text=text)
 
         forbidden_links, forbidden_domains, allowed_links, allowed_domains = (
-            self._get_patterns(event=event, setting=setting)
+            self._get_patterns(event=event)
         )
 
         hard_mode = self._is_setting_enabled(event, "hard_url_filtering")
