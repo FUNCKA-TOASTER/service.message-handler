@@ -108,7 +108,7 @@ class AccountAge(BaseFilter):
                     bpid=event.peer.bpid,
                 )
                 delta = timedelta(days=interval)
-                current_date = datetime.now()
+                current_date = datetime.utcnow()
 
                 if (current_date - created_date) < delta:
                     comment = "Ваш аккаунт слишком молод."
