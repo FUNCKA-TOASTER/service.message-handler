@@ -213,7 +213,7 @@ class LinksAndDomains(BaseFilter):
     def _get_links(text: str) -> set:
         pattern = r"(https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)?)"
         result = re.findall(pattern, text)
-        return {url[0] for url in result}
+        return {link[0] for link in result}
 
     @staticmethod
     def _get_domain(link: str) -> Optional[set]:
@@ -232,9 +232,9 @@ class LinksAndDomains(BaseFilter):
 
     def _get_patterns(self, event: Event) -> Set[str]:
         properties = [
-            (LinkType.url, LinkStatus.forbidden),
+            (LinkType.link, LinkStatus.forbidden),
             (LinkType.domain, LinkStatus.forbidden),
-            (LinkType.url, LinkStatus.allowed),
+            (LinkType.link, LinkStatus.allowed),
             (LinkType.domain, LinkStatus.allowed),
         ]
 
