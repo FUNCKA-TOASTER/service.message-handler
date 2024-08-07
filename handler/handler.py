@@ -31,8 +31,8 @@ class MessageHandler:
 
     def __call__(self, event: Event) -> None:
         try:
-            self._check_content(event)
             self._check_permissions(event)
+            self._check_content(event)
 
             if response := self._execute(event):
                 log, filter = response
@@ -84,15 +84,8 @@ class MessageHandler:
 
         forward = {
             "peer_id": event.peer.bpid,
-            "conversation_message_ids": None,
+            "conversation_message_ids": [event.message.cmid],
         }
-
-        if event.message.reply:
-            forward["conversation_message_ids"] = [event.message.reply.cmid]
-
-        elif event.message.forward:
-            cmids = [reply.cmid for reply in event.message.forward]
-            forward["conversation_message_ids"] = cmids
 
         api = self._get_api()
 
