@@ -1,6 +1,6 @@
 # ⚙️ SERVICE.MESSAGE-HANDLER
 
-![main_img](https://github.com/STALCRAFT-FUNCKA/toaster.message-handling-service/assets/76991612/8bb6b3bf-8385-4d4b-80cc-e104d5283a9c)
+![main_img](https://github.com/FUNCKA-TOASTER/sevice.message-handler/assets/76991612/8bb6b3bf-8385-4d4b-80cc-e104d5283a9c)
 
 ## 📄 Информация
 
