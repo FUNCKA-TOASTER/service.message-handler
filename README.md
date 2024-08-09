@@ -1,54 +1,84 @@
-# ⚙️ TOASTER.MESSAGE-HANDLING-SERVICE
+# ⚙️ SERVICE.MESSAGE-HANDLER
 
 ![main_img](https://github.com/STALCRAFT-FUNCKA/toaster.message-handling-service/assets/76991612/8bb6b3bf-8385-4d4b-80cc-e104d5283a9c)
 
-## 📄 Информация ##
+## 📄 Информация
 
-**TOASTER.MESSAGE-HANDLING-SERVICE** - сервис обработки событий, классифицированных как нажатие кнопки. Событие приходит от сервиса фетчинга, после чего обрабатывается. Праллельно производятся необходимые действия внутреннего\внешнего логирования.
+**SERVICE.MESSAGE-HANDLER** - сервис обработки событий, классифицированных как нажатие "message". Событие приходит от сервиса фетчинга, после чего обрабатывается. Праллельно производятся необходимые действия внутреннего\внешнего логирования.
 
-### Входные данные:
+### Входные данные
 
-**MessageEvent (message_new):**
+```python
+class Event:
+    event_id: int
+    event_type: str
+
+    peer: Peer
+    user: User
+    message: Message
+
 ```
-content type: application\json
 
-{
-    "ts": 1709107923,
-    "datetime": "2024-02-28 11:12:03",
-    "event_type": "message_new", 
-    "event_id": "8dd52b4d7c822b78db23db85bf351c7114e46b36", 
-    "user_id": 206295116, 
-    "user_name": "Руслан Башинский", 
-    "user_nick": "oidaho", 
-    "peer_id": 2000000002, 
-    "peer_name": "FUNCKA | DEV | CHAT", 
-    "chat_id": 2, 
-    "cmid": 2708, 
-    "text": "Hi!", 
-    "reply": null, 
-    "forward": [], 
-    "attachments": []
-}
+```python
+class Message(NamedTuple):
+    cmid: int
+    text: str
+    reply: Optional[Reply]
+    forward: List[Reply]
+    attachments: List[str]
+```
+
+```python
+class Peer(NamedTuple):
+    bpid: int
+    cid: int
+    name: str
+```
+
+```python
+class User(NamedTuple):
+    uuid: int
+    name: str
+    firstname: str
+    lastname: str
+    nick: str
 ```
 
 Пример события, которое приходит от toaster.event-routing-service сервера на toaster.message-handling-service.
 
 Далее, сервис определяет, какая команда была вызвана, а уже после - исполняет все действия, которые за этой командой сокрыты.
 
+### Выходные данные
+
+Каждый раз, когда какой-то из фильтров или систем реагируют на нарушения\определенные условия, сервису необходимо тоже что-то отправить в шину Redis.
+Реакция какого-либо филтьра или системы подразумевает применение каких-то санкций в сторону пользователя.
+Отсюда появляется новый тип события "Punishment". Оно значительно проще события "Event", но играет не меньшую роль в работе сервисов.
+
+```python
+class Punishment:
+    punishment_type: str
+    comment: str
+    cmids: Union[int, List[int]]
+    bpid: int
+    uuid: int
+    points: Optional[int]
+    mode: Optional[str]
+```
 
 ### Дополнительно
 
 Docker setup:
-```
+
+```shell
 docker network
     name: TOASTER
     ip_gateway: 172.18.0.1
-    subnet: 172.18.0.0/16
+    subnet: 172.18.0.0/24
     driver: bridge
 
 
 docker image
-    name: toaster.message-handling-service
+    name: service.message-handler
     args:
         TOKEN: "..."
         GROUPID: "..."
@@ -59,17 +89,16 @@ docker image
 
 
 docker container
-    name: toaster.messaage-handling-service
+    name: service.message-handler
     network_ip: 172.1.08.8
 
-docker volumes:
-    /var/log/TOASTER/toaster.message-handling-service:/service/logs
-```     
+```
 
 Jenkins shell command:
-```
-imageName="toaster.message-handling-service"
-containerName="toaster.message-handling-service"
+
+```shell
+imageName="service.message-handler"
+containerName="service.message-handler"
 localIP="172.18.0.8"
 networkName="TOASTER"
 
@@ -91,7 +120,6 @@ docker build . -t $imageName \
 #run container
 docker run -d \
 --name $containerName \
---volume /var/log/TOASTER/$imageName:/service/logs \
 --restart always \
 $imageName
 
