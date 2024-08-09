@@ -1,3 +1,12 @@
+"""Module "filters".
+
+File:
+    filters.py
+
+About:
+    File describing bot filter and system classes.
+"""
+
 import re
 import requests
 from typing import (
