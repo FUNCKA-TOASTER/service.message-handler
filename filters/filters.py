@@ -309,7 +309,7 @@ class Content(BaseFilter):
                 if self._has_content(event, setting):
                     self.NAME = self.NAME + f" <{setting}>"
 
-                    comment = "Этот контент запрещен."
+                    comment = f"Этот контент ({setting}) запрещен."
                     self._publish_punishment(
                         type="warn",
                         comment=comment,
