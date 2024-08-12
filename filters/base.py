@@ -10,6 +10,7 @@ About:
 from abc import ABC, abstractmethod
 from vk_api import VkApi
 from db import TOASTER_DB
+from toaster_utils.enums import SettingStatus
 from toaster_utils.scripts import (
     get_setting_status,
     get_setting_points,
@@ -50,12 +51,12 @@ class BaseFilter(ABC):
 
     @staticmethod
     def _is_setting_enabled(event: Event, name: str) -> bool:
-        enabled = get_setting_status(
+        status = get_setting_status(
             db_instance=TOASTER_DB,
             bpid=event.peer.bpid,
             name=name,
         )
-        return enabled.value
+        return status == SettingStatus.active
 
     @staticmethod
     def _has_content(event: Event, content_name: str) -> bool:

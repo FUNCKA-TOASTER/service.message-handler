@@ -21,7 +21,6 @@ from vk_api import VkApiError
 from db import TOASTER_DB
 from toaster.broker.events import Event
 from toaster_utils.enums import (
-    SettingStatus,
     LinkStatus,
     LinkType,
 )
@@ -41,8 +40,7 @@ class SlowModeQueue(BaseFilter):
 
     def _handle(self, event: Event) -> bool:
         setting = "slow_mode"
-        status = self._is_setting_enabled(event, setting)
-        if status == SettingStatus.inactive:
+        if not self._is_setting_enabled(event, setting):
             return False
 
         expired = get_user_queue_status(
@@ -76,8 +74,7 @@ class OpenPrivateMessages(BaseFilter):
 
     def _handle(self, event: Event) -> bool:
         setting = "open_pm"
-        status = self._is_setting_enabled(event, setting)
-        if status == SettingStatus.inactive:
+        if not self._is_setting_enabled(event, setting):
             return False
 
         is_opened = self._get_pm_status(event)
@@ -112,8 +109,7 @@ class AccountAge(BaseFilter):
 
     def _handle(self, event: Event) -> bool:
         setting = "account_age"
-        status = self._is_setting_enabled(event, setting)
-        if status == SettingStatus.inactive:
+        if not self._is_setting_enabled(event, setting):
             return False
 
         url = f"https://vk.com/foaf.php?id={event.user.uuid}"
@@ -180,8 +176,7 @@ class LinksAndDomains(BaseFilter):
 
     def _handle(self, event: Event) -> bool:
         setting = "link_filter"
-        status = self._is_setting_enabled(event, setting)
-        if status == SettingStatus.inactive:
+        if not self._is_setting_enabled(event, setting):
             return False
 
         text = event.message.text.lower()
@@ -266,8 +261,7 @@ class CurseWords(BaseFilter):
 
     def _handle(self, event: Event) -> bool:
         setting = "curse_words"
-        status = self._is_setting_enabled(event, setting)
-        if status == SettingStatus.inactive:
+        if not self._is_setting_enabled(event, setting):
             return False
 
         word_list = get_curse_words(
