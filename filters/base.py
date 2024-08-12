@@ -55,7 +55,7 @@ class BaseFilter(ABC):
             bpid=event.peer.bpid,
             name=name,
         )
-        return enabled
+        return enabled.value
 
     @staticmethod
     def _has_content(event: Event, content_name: str) -> bool:
