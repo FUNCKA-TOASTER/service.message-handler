@@ -16,6 +16,7 @@ from typing import (
 from loguru import logger
 from vk_api import VkApi
 from funcka_bots.broker.events import Event
+from funcka_bots.handler import ABCHandler
 from db import TOASTER_DB
 from toaster.enums import UserPermission
 from toaster.scripts import (
@@ -26,7 +27,7 @@ from filters import filter_list
 import config
 
 
-class MessageHandler:
+class MessageHandler(ABCHandler):
     """Message handler class."""
 
     def __call__(self, event: Event) -> None:
