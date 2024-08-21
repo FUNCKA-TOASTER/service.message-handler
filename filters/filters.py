@@ -19,12 +19,12 @@ from datetime import datetime, timedelta
 import xml.etree.ElementTree as ET
 from vk_api import VkApiError
 from db import TOASTER_DB
-from toaster.broker.events import Event
-from toaster_utils.enums import (
+from funcka_bots.broker.events import Event
+from toaster.enums import (
     LinkStatus,
     LinkType,
 )
-from toaster_utils.scripts import (
+from toaster.scripts import (
     get_user_queue_status,
     insert_user_to_queue,
     get_setting_delay,

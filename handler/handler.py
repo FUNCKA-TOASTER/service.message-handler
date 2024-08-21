@@ -15,10 +15,10 @@ from typing import (
 )
 from loguru import logger
 from vk_api import VkApi
-from toaster.broker.events import Event
+from funcka_bots.broker.events import Event
 from db import TOASTER_DB
-from toaster_utils.enums import UserPermission
-from toaster_utils.scripts import (
+from toaster.enums import UserPermission
+from toaster.scripts import (
     get_log_peers,
     get_user_permission,
 )

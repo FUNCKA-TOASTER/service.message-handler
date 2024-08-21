@@ -10,16 +10,16 @@ About:
 from abc import ABC, abstractmethod
 from vk_api import VkApi
 from db import TOASTER_DB
-from toaster_utils.enums import SettingStatus
-from toaster_utils.scripts import (
+from toaster.enums import SettingStatus
+from toaster.scripts import (
     get_setting_status,
     get_setting_points,
 )
-from toaster.broker.events import (
+from funcka_bots.broker.events import (
     Event,
     Punishment,
 )
-from toaster.broker import (
+from funcka_bots.broker import (
     Publisher,
     build_connection,
 )

@@ -12,7 +12,7 @@ About:
 
 import sys
 from loguru import logger
-from toaster.broker import Subscriber, build_connection
+from funcka_bots.broker import Subscriber, build_connection
 from handler import MessageHandler
 import config
 
