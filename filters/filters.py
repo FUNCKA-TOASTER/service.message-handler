@@ -52,8 +52,8 @@ class SlowModeQueue(BaseFilter):
         if expired is not None:
             comment = "Помедленнее! Соблюдай интервал сообщений."
             self._publish_punishment(
-                type="warn",
-                comment=comment,
+                punishment_type="warn",
+                punishment_comment=comment,
                 setting=setting,
                 event=event,
             )
@@ -82,8 +82,8 @@ class OpenPrivateMessages(BaseFilter):
         if not is_opened:
             comment = "Необходимо открыть личные сообщения."
             self._publish_punishment(
-                type="warn",
-                comment=comment,
+                punishment_type="warn",
+                punishment_comment=comment,
                 setting=setting,
                 event=event,
             )
@@ -129,8 +129,8 @@ class AccountAge(BaseFilter):
                 if (current_date - created_date) < delta:
                     comment = "Ваш аккаунт слишком молод."
                     self._publish_punishment(
-                        type="warn",
-                        comment=comment,
+                        punishment_type="warn",
+                        punishment_comment=comment,
                         setting=setting,
                         event=event,
                     )
@@ -228,8 +228,8 @@ class LinksAndDomains(BaseFilter):
     def _init_publish(self, event: BaseEvent, setting: str):
         comment = "Эту ссылку\домен запрещено распространять."
         self._publish_punishment(
-            type="warn",
-            comment=comment,
+            punishment_type="warn",
+            punishment_comment=comment,
             setting=setting,
             event=event,
         )
@@ -274,8 +274,8 @@ class CurseWords(BaseFilter):
             if re.search(r"\b" + re.escape(word) + r"\b", text):
                 comment = "Это слово запрещено."
                 self._publish_punishment(
-                    type="warn",
-                    comment=comment,
+                    punishment_type="warn",
+                    punishment_comment=comment,
                     setting=setting,
                     event=event,
                 )
@@ -311,8 +311,8 @@ class Content(BaseFilter):
 
                     comment = f"Этот контент ({setting}) запрещен."
                     self._publish_punishment(
-                        type="warn",
-                        comment=comment,
+                        punishment_type="warn",
+                        punishment_comment=comment,
                         setting=setting,
                         event=event,
                     )
