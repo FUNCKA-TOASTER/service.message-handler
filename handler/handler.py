@@ -15,7 +15,7 @@ from typing import (
 )
 from loguru import logger
 from vk_api import VkApi
-from funcka_bots.broker.events import Event
+from funcka_bots.broker.events import BaseEvent
 from funcka_bots.handler import ABCHandler
 from db import TOASTER_DB
 from toaster.enums import UserPermission
@@ -30,7 +30,7 @@ import config
 class MessageHandler(ABCHandler):
     """Message handler class."""
 
-    def __call__(self, event: Event) -> None:
+    def __call__(self, event: BaseEvent) -> None:
         try:
             self._check_permissions(event)
             self._check_content(event)
@@ -47,7 +47,7 @@ class MessageHandler(ABCHandler):
         else:
             logger.info("Not a single filter was triggered.")
 
-    def _execute(self, event: Event) -> Optional[str]:
+    def _execute(self, event: BaseEvent) -> Optional[str]:
         for selected in filter_list:
             filter_obj = selected(self._get_api())
             if filter_obj(event):
@@ -55,7 +55,7 @@ class MessageHandler(ABCHandler):
                 return (f"Filter '{filter}' was triggered.", filter)
 
     @staticmethod
-    def _check_content(event: Event) -> Optional[NoReturn]:
+    def _check_content(event: BaseEvent) -> Optional[NoReturn]:
         content = (
             event.message.text,
             event.message.attachments,
@@ -66,7 +66,7 @@ class MessageHandler(ABCHandler):
             raise AttributeError("Missing message content.")
 
     @staticmethod
-    def _check_permissions(event: Event) -> Optional[NoReturn]:
+    def _check_permissions(event: BaseEvent) -> Optional[NoReturn]:
         permission = get_user_permission(
             db_instance=TOASTER_DB,
             uuid=event.user.uuid,
@@ -76,7 +76,7 @@ class MessageHandler(ABCHandler):
         if permission != UserPermission.user:
             raise PermissionError("Ignoring filtering for staff messages.")
 
-    def _alert_about_execution(self, event: Event, name: str):
+    def _alert_about_execution(self, event: BaseEvent, name: str):
         answer_text = (
             f"[id{event.user.uuid}|{event.user.name}] не прошел проверку. \n"
             f"Беседа: {event.peer.name} \n"
