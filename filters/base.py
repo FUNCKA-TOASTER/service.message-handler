@@ -79,7 +79,7 @@ class BaseFilter(ABC):
             punishment_comment=punishment_comment,
             peer=dict(event.peer._asdict()),
             user=dict(event.user._asdict()),
-            message={"cmid": event.message.cmid, "text": "", "attachemnts": []},
+            message={"cmid": event.message.cmid, "text": "", "attachments": []},
             warn={"points": points} if punishment_type == "warn" else None,
             unwarn={"points": points * -1} if punishment_type == "unwarn" else None,
             kick={"mode": "local"} if punishment_type == "kick" else None,
