@@ -15,10 +15,7 @@ from toaster.scripts import (
     get_setting_status,
     get_setting_points,
 )
-from funcka_bots.broker.events import (
-    Event,
-    Punishment,
-)
+from funcka_bots.broker.events import BaseEvent, event_builder
 from funcka_bots.broker import (
     Publisher,
     build_connection,
@@ -35,11 +32,11 @@ class BaseFilter(ABC):
     def __init__(self, api: VkApi) -> None:
         self.api = api
 
-    def __call__(self, event: Event) -> bool:
+    def __call__(self, event: BaseEvent) -> bool:
         return self._handle(event)
 
     @abstractmethod
-    def _handle(self, event: Event) -> bool:
+    def _handle(self, event: BaseEvent) -> bool:
         """The main function of filter execution.
 
         Args:
@@ -50,7 +47,7 @@ class BaseFilter(ABC):
         """
 
     @staticmethod
-    def _is_setting_enabled(event: Event, name: str) -> bool:
+    def _is_setting_enabled(event: BaseEvent, name: str) -> bool:
         status = get_setting_status(
             db_instance=TOASTER_DB,
             bpid=event.peer.bpid,
@@ -59,25 +56,33 @@ class BaseFilter(ABC):
         return status == SettingStatus.active
 
     @staticmethod
-    def _has_content(event: Event, content_name: str) -> bool:
+    def _has_content(event: BaseEvent, content_name: str) -> bool:
         attachments = event.message.attachments
         return content_name in attachments
 
     def _publish_punishment(
-        self, type: str, comment: str, setting: str, event: Event
+        self,
+        punishment_type: str,
+        punishment_comment: str,
+        setting: str,
+        event: BaseEvent,
     ) -> None:
-        coeff = 1
-        if type == "unwarn":
-            type = "warn"
-            coeff = -1
-        punishment = Punishment(type=type, comment=comment)
-        punishment.set_cmids(cmids=event.message.cmid)
-        punishment.set_target(bpid=event.peer.bpid, uuid=event.user.uuid)
-        if type == "warn":
+        if punishment_type in ("warn", "unwarn"):
             points = get_setting_points(
                 db_instance=TOASTER_DB,
                 bpid=event.peer.bpid,
                 name=setting,
             )
-            punishment.set_points(points=points * coeff)
+
+        punishment = event_builder.build_punishment(
+            punishment_type=punishment_type,
+            punishment_comment=punishment_comment,
+            peer=dict(event.peer._asdict()),
+            user=dict(event.user._asdict()),
+            message={"cmid": event.message.cmid, "text": "", "attachemnts": []},
+            warn={"points": points} if punishment_type == "warn" else None,
+            unwarn={"points": points * -1} if punishment_type == "unwarn" else None,
+            kick={"mode": "local"} if punishment_type == "kick" else None,
+        )
+
         self.publisher.publish(punishment, "punishment")

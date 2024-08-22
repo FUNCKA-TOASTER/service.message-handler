@@ -19,7 +19,7 @@ from datetime import datetime, timedelta
 import xml.etree.ElementTree as ET
 from vk_api import VkApiError
 from db import TOASTER_DB
-from funcka_bots.broker.events import Event
+from funcka_bots.broker.events import BaseEvent
 from toaster.enums import (
     LinkStatus,
     LinkType,
@@ -38,7 +38,7 @@ from .base import BaseFilter
 class SlowModeQueue(BaseFilter):
     NAME = "Slow Mode"
 
-    def _handle(self, event: Event) -> bool:
+    def _handle(self, event: BaseEvent) -> bool:
         setting = "slow_mode"
         if not self._is_setting_enabled(event, setting):
             return False
@@ -72,7 +72,7 @@ class SlowModeQueue(BaseFilter):
 class OpenPrivateMessages(BaseFilter):
     NAME = "Open Private Messages"
 
-    def _handle(self, event: Event) -> bool:
+    def _handle(self, event: BaseEvent) -> bool:
         setting = "open_pm"
         if not self._is_setting_enabled(event, setting):
             return False
@@ -91,7 +91,7 @@ class OpenPrivateMessages(BaseFilter):
 
         return False
 
-    def _get_pm_status(self, event: Event) -> Union[bool, NoReturn]:
+    def _get_pm_status(self, event: BaseEvent) -> Union[bool, NoReturn]:
         try:
             status = self.api.users.get(
                 user_ids=event.user.uuid,
@@ -107,7 +107,7 @@ class OpenPrivateMessages(BaseFilter):
 class AccountAge(BaseFilter):
     NAME = "Account Age"
 
-    def _handle(self, event: Event) -> bool:
+    def _handle(self, event: BaseEvent) -> bool:
         setting = "account_age"
         if not self._is_setting_enabled(event, setting):
             return False
@@ -174,7 +174,7 @@ class AccountAge(BaseFilter):
 class LinksAndDomains(BaseFilter):
     NAME = "Links & Domains"
 
-    def _handle(self, event: Event) -> bool:
+    def _handle(self, event: BaseEvent) -> bool:
         setting = "link_filter"
         if not self._is_setting_enabled(event, setting):
             return False
@@ -225,7 +225,7 @@ class LinksAndDomains(BaseFilter):
         domain = re.findall(pattern, link)
         return domain[0] if domain else None
 
-    def _init_publish(self, event: Event, setting: str):
+    def _init_publish(self, event: BaseEvent, setting: str):
         comment = "Эту ссылку\домен запрещено распространять."
         self._publish_punishment(
             type="warn",
@@ -234,7 +234,7 @@ class LinksAndDomains(BaseFilter):
             event=event,
         )
 
-    def _get_patterns(self, event: Event) -> Set[str]:
+    def _get_patterns(self, event: BaseEvent) -> Set[str]:
         properties = [
             (LinkType.link, LinkStatus.forbidden),
             (LinkType.domain, LinkStatus.forbidden),
@@ -259,7 +259,7 @@ class LinksAndDomains(BaseFilter):
 class CurseWords(BaseFilter):
     NAME = "Curse Words"
 
-    def _handle(self, event: Event) -> bool:
+    def _handle(self, event: BaseEvent) -> bool:
         setting = "curse_words"
         if not self._is_setting_enabled(event, setting):
             return False
@@ -303,7 +303,7 @@ class Content(BaseFilter):
         "geo",
     )
 
-    def _handle(self, event: Event) -> bool:
+    def _handle(self, event: BaseEvent) -> bool:
         for setting in self.CONTENT:
             if self._is_setting_enabled(event, setting):
                 if self._has_content(event, setting):
