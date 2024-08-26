@@ -9,16 +9,12 @@ About:
 
 from abc import ABC, abstractmethod
 from vk_api import VkApi
-from db import TOASTER_DB
+from funcka_bots.events import BaseEvent, event_builder
+from funcka_bots.broker import Publisher
 from toaster.enums import SettingStatus
 from toaster.scripts import (
     get_setting_status,
     get_setting_points,
-)
-from funcka_bots.broker.events import BaseEvent, event_builder
-from funcka_bots.broker import (
-    Publisher,
-    build_connection,
 )
 import config
 
@@ -27,7 +23,7 @@ class BaseFilter(ABC):
     """Base class of the bot filter."""
 
     NAME = "None"
-    publisher = Publisher(build_connection(config.REDIS_CREDS))
+    publisher = Publisher(creds=config.BROKER_CREDS)
 
     def __init__(self, api: VkApi) -> None:
         self.api = api
@@ -49,7 +45,6 @@ class BaseFilter(ABC):
     @staticmethod
     def _is_setting_enabled(event: BaseEvent, name: str) -> bool:
         status = get_setting_status(
-            db_instance=TOASTER_DB,
             bpid=event.peer.bpid,
             name=name,
         )
@@ -69,7 +64,6 @@ class BaseFilter(ABC):
     ) -> None:
         if punishment_type in ("warn", "unwarn"):
             points = get_setting_points(
-                db_instance=TOASTER_DB,
                 bpid=event.peer.bpid,
                 name=setting,
             )

@@ -8,16 +8,11 @@ About:
 """
 
 import json
-from typing import (
-    Any,
-    Optional,
-    NoReturn,
-)
+from typing import Any, Optional, NoReturn
 from loguru import logger
 from vk_api import VkApi
-from funcka_bots.broker.events import BaseEvent
+from funcka_bots.events import BaseEvent
 from funcka_bots.handler import ABCHandler
-from db import TOASTER_DB
 from toaster.enums import UserPermission
 from toaster.scripts import (
     get_log_peers,
@@ -67,11 +62,7 @@ class MessageHandler(ABCHandler):
 
     @staticmethod
     def _check_permissions(event: BaseEvent) -> Optional[NoReturn]:
-        permission = get_user_permission(
-            db_instance=TOASTER_DB,
-            uuid=event.user.uuid,
-            bpid=event.peer.bpid,
-        )
+        permission = get_user_permission(uuid=event.user.uuid, bpid=event.peer.bpid)
 
         if permission != UserPermission.user:
             raise PermissionError("Ignoring filtering for staff messages.")
@@ -90,7 +81,7 @@ class MessageHandler(ABCHandler):
 
         api = self._get_api()
 
-        for bpid in get_log_peers(db_instance=TOASTER_DB):
+        for bpid in get_log_peers():
             api.messages.send(
                 peer_ids=bpid,
                 random_id=0,
@@ -100,7 +91,7 @@ class MessageHandler(ABCHandler):
 
     def _get_api(self) -> Any:
         session = VkApi(
-            token=config.TOKEN,
-            api_version=config.API_VERSION,
+            token=config.VK_GROUP_TOKEN,
+            api_version=config.VK_API_VERSION,
         )
         return session.get_api()

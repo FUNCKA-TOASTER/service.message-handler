@@ -9,21 +9,12 @@ About:
 
 import re
 import requests
-from typing import (
-    Optional,
-    NoReturn,
-    Union,
-    Set,
-)
+from typing import Optional, NoReturn, Union, Set
 from datetime import datetime, timedelta
-import xml.etree.ElementTree as ET
 from vk_api import VkApiError
-from db import TOASTER_DB
-from funcka_bots.broker.events import BaseEvent
-from toaster.enums import (
-    LinkStatus,
-    LinkType,
-)
+import xml.etree.ElementTree as ET
+from funcka_bots.events import BaseEvent
+from toaster.enums import LinkStatus, LinkType
 from toaster.scripts import (
     get_user_queue_status,
     insert_user_to_queue,
@@ -43,11 +34,7 @@ class SlowModeQueue(BaseFilter):
         if not self._is_setting_enabled(event, setting):
             return False
 
-        expired = get_user_queue_status(
-            db_instance=TOASTER_DB,
-            uuid=event.user.uuid,
-            bpid=event.peer.bpid,
-        )
+        expired = get_user_queue_status(uuid=event.user.uuid, bpid=event.peer.bpid)
 
         if expired is not None:
             comment = "Помедленнее! Соблюдай интервал сообщений."
@@ -60,10 +47,7 @@ class SlowModeQueue(BaseFilter):
             return True
 
         insert_user_to_queue(
-            db_instance=TOASTER_DB,
-            uuid=event.user.uuid,
-            bpid=event.peer.bpid,
-            setting=setting,
+            uuid=event.user.uuid, bpid=event.peer.bpid, setting=setting
         )
 
         return False
@@ -118,11 +102,7 @@ class AccountAge(BaseFilter):
         if str_xml_data:
             created_date = self.extract_created_date(str_xml_data)
             if created_date:
-                interval = get_setting_delay(
-                    db_instance=TOASTER_DB,
-                    name=setting,
-                    bpid=event.peer.bpid,
-                )
+                interval = get_setting_delay(name=setting, bpid=event.peer.bpid)
                 delta = timedelta(days=interval)
                 current_date = datetime.utcnow()
 
@@ -244,14 +224,7 @@ class LinksAndDomains(BaseFilter):
 
         result = []
         for type, status in properties:
-            result.append(
-                get_patterns(
-                    db_instance=TOASTER_DB,
-                    bpid=event.peer.bpid,
-                    type=type,
-                    status=status,
-                )
-            )
+            result.append(get_patterns(bpid=event.peer.bpid, type=type, status=status))
 
         return result
 
@@ -264,10 +237,7 @@ class CurseWords(BaseFilter):
         if not self._is_setting_enabled(event, setting):
             return False
 
-        word_list = get_curse_words(
-            db_instance=TOASTER_DB,
-            bpid=event.peer.bpid,
-        )
+        word_list = get_curse_words(bpid=event.peer.bpid)
 
         for word in word_list:
             text = event.message.text.lower()
