@@ -10,20 +10,18 @@ About:
 from abc import ABC, abstractmethod
 from vk_api import VkApi
 from funcka_bots.events import BaseEvent, event_builder
-from funcka_bots.broker import Publisher
+from toaster import broker
 from toaster.enums import SettingStatus
 from toaster.scripts import (
     get_setting_status,
     get_setting_points,
 )
-import config
 
 
 class BaseFilter(ABC):
     """Base class of the bot filter."""
 
     NAME = "None"
-    publisher = Publisher(creds=config.BROKER_CREDS)
 
     def __init__(self, api: VkApi) -> None:
         self.api = api
@@ -79,4 +77,4 @@ class BaseFilter(ABC):
             kick={"mode": "local"} if punishment_type == "kick" else None,
         )
 
-        self.publisher.publish(punishment, "punishment")
+        broker.publish(punishment, "punishment")
